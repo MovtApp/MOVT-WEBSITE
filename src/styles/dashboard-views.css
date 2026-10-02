@@ -27,9 +27,9 @@
 /* ---------- Cabeçalho de seção + "Ver mais" ---------- */
 .sec-head { display: flex; align-items: center; justify-content: space-between; gap: 12px 16px; flex-wrap: wrap; margin-bottom: 16px; }
 .panel .sec-head { margin-bottom: 18px; }
-.sec-title { font-weight: 700; font-size: 20px; }
+.sec-title { font-weight: 700; font-size: clamp(18px, 1.5cqi, 23px); }
 .block > .sec-head .sec-title {
-  font-size: clamp(22px, 2.4vw, 28px);
+  font-size: clamp(22px, 2.1cqi, 34px);
   background: linear-gradient(0deg, var(--lime) 0%, var(--white) 100%);
   -webkit-background-clip: text;
   background-clip: text;
@@ -115,7 +115,7 @@
 .page-head p { font-family: var(--f-small); color: var(--muted); font-size: 14px; max-width: 560px; line-height: 1.5; }
 
 /* ---------- KPIs ---------- */
-.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 22px; }
+.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gap); margin-bottom: var(--gap); }
 .kpi {
   --c: var(--lime);
   position: relative;
@@ -146,7 +146,7 @@
   margin-bottom: 14px;
 }
 .kpi p { font-family: var(--f-small); font-size: 12px; color: var(--muted); }
-.kpi b { display: block; font-size: 28px; font-weight: 700; margin-top: 4px; line-height: 1.1; }
+.kpi b { display: block; font-size: clamp(24px, 2.3cqi, 36px); font-weight: 700; margin-top: 4px; line-height: 1.1; }
 .kpi small { display: block; margin-top: 4px; font-family: var(--f-small); font-size: 11px; color: rgba(255, 255, 255, 0.45); }
 .kpi b .of { display: inline; font-size: 16px; color: var(--muted); margin: 0; }
 .sk-kpi { min-height: 132px; }
@@ -224,7 +224,7 @@
 .result-count { font-family: var(--f-small); font-size: 13px; color: var(--muted); margin-left: auto; }
 
 /* ---------- Grade de cards (catálogo) ---------- */
-.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(clamp(200px, 17cqi, 270px), 1fr)); gap: var(--gap); }
 .cards .ex { aspect-ratio: 4 / 5; }
 .ex-cat { font: 900 10px var(--f-display); letter-spacing: 0.14em; text-transform: uppercase; color: var(--lime); margin-bottom: 6px; }
 .ex-level {
@@ -273,7 +273,7 @@
 .sheet-extra:empty { display: none; }
 
 /* ---------- Agenda ---------- */
-.agenda-layout { display: grid; grid-template-columns: minmax(300px, 380px) 1fr; gap: 22px; align-items: start; }
+.agenda-layout { display: grid; grid-template-columns: clamp(300px, 30cqi, 460px) 1fr; gap: var(--gap); align-items: start; }
 .cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
 .cal-head h2 { font-size: 18px; font-weight: 700; }
 .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
@@ -348,7 +348,7 @@
   margin-bottom: 22px;
 }
 .plan-hero .eyebrow { font-size: 12px; }
-.plan-hero h2 { font-size: clamp(38px, 5vw, 56px); font-weight: 900; line-height: 1; margin: 10px 0 12px; }
+.plan-hero h2 { font-size: clamp(38px, 4.6cqi, 68px); font-weight: 900; line-height: 1; margin: 10px 0 12px; }
 .plan-hero p { font-family: var(--f-small); color: var(--muted); font-size: 14px; line-height: 1.5; }
 .plan-hero .btns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
 .plan-facts { display: flex; flex-direction: column; gap: 10px; justify-content: center; }
@@ -378,7 +378,7 @@
 .sk-post { min-height: 420px; border-radius: 24px; }
 .sk-tile { aspect-ratio: 1; min-height: 0; border-radius: 18px; }
 .sk-comm { min-height: 360px; border-radius: 24px; }
-.usage { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+.usage { display: grid; grid-template-columns: repeat(auto-fit, minmax(clamp(180px, 15cqi, 240px), 1fr)); gap: clamp(12px, 1.3cqi, 20px); }
 .usage-item { padding: 18px; border-radius: 18px; background: #141414; }
 .usage-item p { display: flex; justify-content: space-between; font-family: var(--f-small); font-size: 13px; color: var(--muted); margin-bottom: 10px; }
 .usage-item p b { color: var(--white); font-weight: 600; }
@@ -386,7 +386,7 @@
 .usage-item .bar i.full { background: #ff8a8a; }
 .usage-item small { display: block; margin-top: 8px; font-family: var(--f-small); font-size: 11px; color: rgba(255, 255, 255, 0.45); }
 
-.plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap); }
 .plan-card-x {
   position: relative;
   display: flex;
@@ -415,7 +415,7 @@
 .plan-ribbon.muted { background: rgba(255, 255, 255, 0.12); color: var(--white); }
 .plan-card-x h3 { font-size: 22px; font-weight: 700; }
 .plan-price { margin: 14px 0 6px; display: flex; align-items: baseline; gap: 6px; }
-.plan-price b { font-size: 38px; font-weight: 900; line-height: 1; }
+.plan-price b { font-size: clamp(32px, 3cqi, 46px); font-weight: 900; line-height: 1; }
 .plan-price span { font-family: var(--f-small); font-size: 13px; color: var(--muted); }
 .plan-card-x > p { font-family: var(--f-small); font-size: 13px; color: var(--muted); line-height: 1.5; min-height: 40px; }
 .feat { list-style: none; margin: 18px 0 22px; padding: 0; display: flex; flex-direction: column; gap: 10px; }
@@ -439,7 +439,7 @@
   background: var(--card);
   margin-bottom: 22px;
 }
-.profile-banner { height: 150px; background: linear-gradient(120deg, rgba(192, 255, 115, 0.35), rgba(90, 184, 255, 0.18) 60%, #171717); background-size: cover; background-position: center; }
+.profile-banner { height: clamp(120px, 12cqi, 200px); background: linear-gradient(120deg, rgba(192, 255, 115, 0.35), rgba(90, 184, 255, 0.18) 60%, #171717); background-size: cover; background-position: center; }
 .profile-body { display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap; padding: 0 28px 24px; margin-top: -48px; }
 .profile-avatar {
   width: 104px;
@@ -457,7 +457,7 @@
 }
 .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
 .profile-id { flex: 1; min-width: 200px; padding-bottom: 4px; }
-.profile-id h2 { font-size: 24px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.profile-id h2 { font-size: clamp(22px, 2cqi, 30px); font-weight: 700; display: flex; align-items: center; gap: 8px; }
 .profile-id .handle { font-family: var(--f-small); font-size: 13px; color: var(--muted); }
 .profile-id .bio { margin-top: 8px; font-size: 14px; line-height: 1.5; color: rgba(255, 255, 255, 0.85); max-width: 560px; }
 .profile-meta { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 8px; font-family: var(--f-small); font-size: 12px; color: var(--muted); }
@@ -468,7 +468,7 @@
 .profile-stats b { display: block; font-size: 22px; font-weight: 700; }
 .profile-stats span { font-family: var(--f-small); font-size: 11px; color: var(--muted); }
 
-.feed { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; align-items: start; }
+.feed { display: grid; grid-template-columns: repeat(auto-fill, minmax(clamp(280px, 24cqi, 380px), 1fr)); gap: var(--gap); align-items: start; }
 .fpost { border-radius: 24px; background: var(--card); overflow: hidden; display: flex; flex-direction: column; }
 .fpost-head { display: flex; align-items: center; gap: 10px; padding: 14px 16px; }
 .fpost-head img, .fpost-head .ph { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; background: #262626; display: grid; place-items: center; font-weight: 700; font-size: 14px; flex: 0 0 auto; }
@@ -499,7 +499,7 @@
 .fpost-caption { font-size: 14px; line-height: 1.5; color: rgba(255, 255, 255, 0.85); overflow-wrap: anywhere; }
 .fpost-caption b { margin-right: 6px; }
 
-.posts { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+.posts { display: grid; grid-template-columns: repeat(auto-fill, minmax(clamp(160px, 14cqi, 240px), 1fr)); gap: clamp(6px, 0.8cqi, 14px); }
 .tile { position: relative; aspect-ratio: 1; border-radius: 18px; overflow: hidden; background: #1f1f1f; }
 .tile img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s var(--ease); }
 .tile:hover img { transform: scale(1.06); }
@@ -520,7 +520,7 @@
 .tile-over .ic { width: 18px; height: 18px; fill: currentColor; }
 .tile-cap { position: absolute; inset: 0; padding: 14px; display: flex; align-items: flex-end; font-size: 13px; line-height: 1.4; background: linear-gradient(160deg, rgba(192, 255, 115, 0.2), #1a1a1a); }
 
-.comms { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
+.comms { display: grid; grid-template-columns: repeat(auto-fill, minmax(clamp(260px, 22cqi, 360px), 1fr)); gap: var(--gap); }
 .comm { display: flex; flex-direction: column; border-radius: 24px; background: var(--card); overflow: hidden; }
 .comm-img { position: relative; aspect-ratio: 16 / 9; background: linear-gradient(135deg, rgba(192, 255, 115, 0.25), #1c1c1c); }
 .comm-img img { width: 100%; height: 100%; object-fit: cover; }
@@ -578,15 +578,19 @@
 /* ============================================================
    RESPONSIVO
    ============================================================ */
-@media (max-width: 1200px) {
+/* Largura disponível para o conteúdo (muda ao recolher/expandir o sidebar) */
+@container dash (max-width: 880px) {
   .plans { grid-template-columns: 1fr; max-width: 560px; }
   .agenda-layout { grid-template-columns: 1fr; }
 }
-@media (max-width: 900px) {
+@container dash (max-width: 760px) {
   .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .plan-hero { grid-template-columns: 1fr; padding: 22px; }
 }
 @media (max-width: 640px) {
+  .toasts { right: 16px; left: 16px; bottom: 16px; max-width: none; }
+}
+@container dash (max-width: 600px) {
   .sec-head { align-items: flex-start; }
   .profile-body { padding: 0 18px 20px; }
   .profile-stats { width: 100%; }
@@ -599,7 +603,6 @@
   .feed { grid-template-columns: 1fr; }
   .posts { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
   .tile { border-radius: 8px; }
-  .toasts { right: 16px; left: 16px; bottom: 16px; max-width: none; }
   /* Sessão no celular: data + nome/horário na 1ª linha; status e ação embaixo */
   .appt { flex-wrap: wrap; row-gap: 10px; }
   .appt-avatar { display: none; }
