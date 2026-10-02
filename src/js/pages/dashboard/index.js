@@ -92,6 +92,55 @@ import treinos from "./views/treinos.js";
     setMenu(false);
   });
 
+  /* ---------- Sidebar recolhível (desktop) ---------- */
+  // O estado inicial já foi aplicado no <head> por auth-guard.js (sem "piscar")
+  const root = document.documentElement;
+  const toggle = $("#side-toggle");
+  const tip = $("#side-tip");
+  const desktop = matchMedia("(min-width: 901px)");
+  const isCollapsed = () => root.classList.contains("side-collapsed");
+  const syncToggle = () => {
+    const c = isCollapsed();
+    const label = c ? "Expandir menu" : "Recolher menu";
+    toggle.setAttribute("aria-expanded", String(!c));
+    toggle.setAttribute("aria-label", label);
+    toggle.dataset.tip = `${label} · ${/Mac|iPhone|iPad/.test(navigator.platform) ? "⌘" : "Ctrl"}+B`;
+  };
+  const setCollapsed = (c) => {
+    root.classList.toggle("side-collapsed", c);
+    tip.hidden = true;
+    syncToggle();
+    try {
+      localStorage.setItem("movt:side", c ? "collapsed" : "expanded");
+    } catch {}
+  };
+  toggle.addEventListener("click", () => setCollapsed(!isCollapsed()));
+  addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && String(e.key).toLowerCase() === "b" && desktop.matches) {
+      e.preventDefault();
+      setCollapsed(!isCollapsed());
+    }
+  });
+  syncToggle();
+
+  // Tooltip: nomes dos itens quando recolhido; o botão sempre mostra o atalho
+  const showTip = (e) => {
+    const el = e.target.closest?.("[data-tip]");
+    if (!el || !side.contains(el) || !desktop.matches || (!isCollapsed() && el !== toggle)) return void (tip.hidden = true);
+    const r = el.getBoundingClientRect();
+    tip.textContent = el.dataset.tip;
+    tip.style.left = `${r.right + 12}px`;
+    tip.style.top = `${r.top + r.height / 2}px`;
+    tip.hidden = false;
+  };
+  const hideTip = () => (tip.hidden = true);
+  side.addEventListener("mouseover", showTip);
+  side.addEventListener("focusin", showTip);
+  side.addEventListener("mouseleave", hideTip);
+  side.addEventListener("focusout", hideTip);
+  side.addEventListener("scroll", hideTip, { passive: true });
+  side.addEventListener("click", hideTip);
+
   $$("[data-logout]").forEach((b) => b.addEventListener("click", logout));
   initSheet();
 
