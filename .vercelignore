@@ -1,0 +1,25 @@
+# O que NÃO sobe no `vercel deploy` (a Vercel instala as dependências e faz o
+# build lá). Com este arquivo presente, o .gitignore não é usado pela CLI.
+
+# Segredos locais: NUNCA enviar (as variáveis de produção ficam no painel/CLI)
+.env
+.env.*
+!.env.example
+
+# Dependências e build locais
+node_modules
+dist
+.vite
+
+# Vínculo local da CLI, ferramentas e worktrees
+.vercel
+.claude
+.vscode
+.idea
+
+# Não são usados no build nem em runtime
+tests
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db

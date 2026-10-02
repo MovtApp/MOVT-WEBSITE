@@ -13,7 +13,8 @@ Navegador ──cookie HttpOnly──► api/ (BFF, Vercel) ──Bearer + IP as
 
 ## Requisitos
 
-- Node.js 20.19 ou superior
+- Node.js 22.12 ou superior (na Vercel o build usa o Node 24)
+- [Vercel CLI](https://vercel.com/docs/cli) para deploy: `npm i -g vercel`
 
 ## Comandos
 
@@ -26,6 +27,9 @@ npm run lint         # ESLint
 npm test             # testes de segurança do BFF (backend falso, nada toca a produção)
 npm run check        # lint + testes + build (rode antes de abrir PR)
 npm run sync:legal   # regenera /termos e /privacidade a partir das telas do app (../MOVT)
+npm run vercel:env   # configura BFF_SESSION_KEY e BFF_PROXY_SECRET na Vercel (Production + Preview)
+npm run deploy       # deploy de preview (URL temporária)
+npm run deploy:prod  # check completo + deploy de produção
 ```
 
 > Alterações em `api/` exigem reiniciar o `npm run dev`.
@@ -131,21 +135,55 @@ Regras ao mexer no código:
 3. **Dados da API em `innerHTML` passam por `esc()`, e URLs por `safeUrl()`.**
 4. **Consentimento:** `CONSENT_VERSIONS` em `api/_lib/routes.js` precisa ser igual ao de `MOVT-BACKEND/lib/privacy.js`.
 
-## Deploy (Vercel + Registro.br)
+## Deploy na Vercel (CLI)
 
-**Ordem obrigatória:**
+O deploy sobe os arquivos desta pasta para a Vercel, que instala as dependências e roda `npm run build` lá. O que **não** sobe está no [`.vercelignore`](.vercelignore): `.env.local` e outros segredos, `node_modules`, `dist`, `.claude`, testes. O upload fica em ~2 MB.
 
-1. **Backend primeiro:** faça o merge e o deploy da branch `feat/trusted-bff-proxy` do `MOVT-BACKEND` e configure lá:
-   - `BFF_PROXY_SECRET`, com o mesmo valor que você vai usar no site
-   - `CORS_ORIGINS` deixa de ser necessário para o site, porque o navegador não chama mais o backend
-2. **Site:** na Vercel, configure `BFF_SESSION_KEY` e `BFF_PROXY_SECRET` (Production e Preview).
-3. **Domínio:** em *Settings → Domains*, adicione `movt.app` e `www.movt.app`. No Registro.br (*DNS → Editar zona*), crie os registros A e CNAME que a Vercel mostrar.
+> Faça o deploy de uma cópia **limpa** da branch certa (normalmente a `main`): a CLI envia os arquivos como estão no disco, inclusive alterações não commitadas.
 
-Gerar os segredos:
+### Primeira vez (uma vez por máquina/projeto)
+
+**Ordem obrigatória:** o backend primeiro.
+
+1. **MOVT-BACKEND:** faça o merge/deploy da branch `feat/trusted-bff-proxy` e configure lá `BFF_PROXY_SECRET` (o mesmo valor que o site vai usar). `CORS_ORIGINS` deixa de ser necessário para o site, porque o navegador não chama mais o backend.
+2. **Instalar e entrar:**
+   ```bash
+   npm i -g vercel
+   vercel login
+   ```
+3. **Vincular esta pasta ao projeto** (cria `.vercel/`, já ignorado pelo git):
+   ```bash
+   vercel link
+   vercel project inspect     # confira se o dono e o projeto são os certos
+   ```
+   Na primeira vez, se o projeto não existir, a CLI oferece criar. Ela detecta **Vite** e usa o `vercel.json` (build `npm run build`, saída `dist`, função `api/index.js`).
+4. **Variáveis obrigatórias** (Production + Preview):
+   ```bash
+   npm run vercel:env
+   ```
+   O script gera uma `BFF_SESSION_KEY` diferente para cada ambiente e pede o `BFF_PROXY_SECRET` sem mostrá-lo na tela. Nenhum valor é impresso, e variáveis que já existem **não** são sobrescritas (trocar a chave de sessão desloga todo mundo). Opcionais, pelo painel ou `vercel env add`: `ALLOWED_ORIGINS` (ex.: `https://www.movt.app`), `UPSTASH_REDIS_REST_URL`/`_TOKEN`, `UPSTREAM_API_URL`.
+
+### A cada deploy
 
 ```bash
-node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+npm run deploy        # preview: URL temporária para testar
+npm run deploy:prod   # lint + testes + build local e, se tudo passar, produção
 ```
-```bash
-node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
-```
+
+Para testar um preview protegido sem desligar a proteção: `vercel curl /api/auth/session --deployment <url-do-preview>`.
+
+Desfazer: `vercel rollback <url-anterior>` volta a produção para um deploy anterior sem rebuild.
+
+### Domínio (Registro.br)
+
+Em *Settings → Domains* (ou `vercel domains add movt.app`), adicione `movt.app` e `www.movt.app`. No Registro.br (*DNS → Editar zona*), crie os registros A e CNAME que a Vercel mostrar.
+
+### Cuidados
+
+- **`vercel env pull` grava em `.env.local` por padrão** e sobrescreve a sua `BFF_SESSION_KEY` local. Se precisar, use `vercel env pull .env.vercel.local`.
+- Sem `BFF_SESSION_KEY` ou `BFF_PROXY_SECRET`, o BFF na Vercel responde **503 em todas as rotas** (fail closed): o site abre, mas login e dashboard não funcionam.
+- Gerar segredos manualmente, se precisar:
+  ```bash
+  node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"      # BFF_SESSION_KEY
+  node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"   # BFF_PROXY_SECRET
+  ```
