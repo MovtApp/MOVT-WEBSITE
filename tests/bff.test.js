@@ -341,6 +341,137 @@ describe("ações: cancelar agendamento", () => {
   });
 });
 
+/* ---------- Plano e assinatura ---------- */
+const STRIPE_PLANS = [
+  { id: "prod_free", stripe_price_id: "price_free", name: "MOVT Gratuito", price: 0, currency: "brl", interval: "month", metadata: {} },
+  { id: "prod_p", stripe_product_id: "prod_p", stripe_price_id: "price_prem1", name: "MOVT Premium", description: "Tudo liberado", price: 29.9, currency: "brl", interval: "month", billing_scheme: "per_unit", metadata: { plan_type: "premium", interno: "x" } },
+  { id: "prod_f", stripe_price_id: "price_fam1", name: "Plano Família", price: 49.9, currency: "brl", interval: "month", metadata: {} },
+];
+// Responde /plans com o catálogo e delega o resto
+const withCatalog = (rest) => (call) => (call.url === "/api/plans" ? { status: 200, body: STRIPE_PLANS } : rest(call));
+
+describe("plano e assinatura", () => {
+  test("catálogo exige sessão e sai sem IDs de produto/metadados", async () => {
+    assert.equal((await client().call("GET", "/api/plans")).status, 401);
+    const c = await loggedIn();
+    upstreamReply = withCatalog(() => ({ status: 500, body: {} }));
+    const r = await c.call("GET", "/api/plans");
+    assert.equal(r.status, 200);
+    assert.deepEqual(r.data.data[1], { priceId: "price_prem1", type: "premium", name: "MOVT Premium", description: "Tudo liberado", price: 29.9, currency: "brl", interval: "month" });
+    assert.equal(r.data.data[2].type, "familia");
+    assert.ok(!JSON.stringify(r.data).includes("prod_"));
+  });
+
+  test("cobrança: sem e-mail/CPF; do cartão só bandeira e final", async () => {
+    const c = await loggedIn();
+    upstreamReply = () => ({
+      status: 200,
+      body: { hasSubscription: true, userType: "PF", email: "ana@x.com", cpf: "52998224725", plan: "premium", status: "active", planName: "Premium", amount: 29.9, currency: "brl", nextBillingDate: "2026-11-02T10:00:00Z", card: { brand: "visa", last4: "4242", expMonth: 4, expYear: 2030, fingerprint: "fp" } },
+    });
+    const r = await c.call("GET", "/api/me/billing");
+    const s = JSON.stringify(r.data);
+    assert.ok(!s.includes("ana@x.com") && !s.includes("52998224725") && !s.includes("fp"));
+    assert.deepEqual(r.data.card, { brand: "visa", last4: "4242", expMonth: 4, expYear: 2030 });
+    assert.equal(r.data.nextBillingDate, "2026-11-02");
+  });
+
+  test("checkout: preço fora do catálogo ou do plano grátis → 400 sem criar sessão", async () => {
+    const c = await loggedIn();
+    upstreamReply = withCatalog(() => ({ status: 200, body: { url: "https://checkout.stripe.com/x" } }));
+    for (const priceId of ["price_inventado", "price_free"]) {
+      const r = await c.post("/api/me/billing/checkout", { priceId });
+      assert.equal(r.status, 400, priceId);
+    }
+    assert.ok(!upstreamCalls.some((x) => x.url === "/api/create-checkout-session"));
+  });
+
+  test("checkout: Premium com 1 vaga, Família limitada a 2–10, retorno no próprio site", async () => {
+    const c = await loggedIn();
+    upstreamReply = withCatalog(() => ({ status: 200, body: { url: "https://checkout.stripe.com/c/pay/cs_1" } }));
+    let r = await c.post("/api/me/billing/checkout", { priceId: "price_prem1", quantity: 7 });
+    assert.equal(r.status, 200);
+    assert.equal(r.data.url, "https://checkout.stripe.com/c/pay/cs_1");
+    let sent = upstreamCalls.at(-1).body;
+    assert.equal(sent.quantity, 1);
+    assert.equal(sent.returnUrl, `${origin}/dashboard/plano?checkout=retorno`);
+    await c.post("/api/me/billing/checkout", { priceId: "price_fam1", quantity: 1 });
+    assert.equal(upstreamCalls.at(-1).body.quantity, 2);
+    r = await c.post("/api/me/billing/checkout", { priceId: "price_fam1", quantity: 11 });
+    assert.equal(r.status, 400); // fora do schema
+  });
+
+  test("checkout/portal: URL de pagamento fora da Stripe é recusada (502)", async () => {
+    const c = await loggedIn();
+    upstreamReply = withCatalog(() => ({ status: 200, body: { url: "https://checkout.stripe.com.evil.example/pay" } }));
+    assert.equal((await c.post("/api/me/billing/checkout", { priceId: "price_prem1" })).status, 502);
+    upstreamReply = () => ({ status: 200, body: { url: "http://billing.stripe.com/p/x" } }); // sem HTTPS
+    assert.equal((await c.post("/api/me/billing/portal")).status, 502);
+    upstreamReply = () => ({ status: 200, body: { url: "https://billing.stripe.com/p/session/x" } });
+    const ok = await c.post("/api/me/billing/portal");
+    assert.equal(ok.status, 200);
+    assert.equal(ok.data.url, "https://billing.stripe.com/p/session/x");
+  });
+});
+
+/* ---------- Comunidade ---------- */
+describe("comunidade", () => {
+  test("perfil e meus posts usam o ID da sessão (sem IDOR)", async () => {
+    const c = await loggedIn({ uid: 77 });
+    upstreamReply = () => ({ status: 200, body: { success: true, data: { id: 77, name: "Ana", username: "ana", photo: "https://cdn.x/a.jpg", is_following: false, isFollowing: false } } });
+    const r = await c.call("GET", "/api/me/profile?id=1");
+    assert.equal(upstreamCalls.at(-1).url, "/api/user/77");
+    assert.ok(!("id" in r.data) && !("isFollowing" in r.data));
+    upstreamReply = () => ({ status: 200, body: { success: true, data: [{ id: 5, id_us: 77, image_url: "https://cdn.x/p.jpg", legenda: "oi", likes_count: "3", archived: false }] } });
+    const p = await c.call("GET", "/api/me/posts");
+    assert.equal(upstreamCalls.at(-1).url, "/api/user/77/posts");
+    assert.deepEqual(p.data.data[0], { id: "5", image: "https://cdn.x/p.jpg", caption: "oi", likes: 3, comments: 0, createdAt: null });
+  });
+
+  test("feed: sem ID interno do autor; imagem só HTTPS", async () => {
+    const c = await loggedIn();
+    upstreamReply = () => ({
+      status: 200,
+      body: { success: true, posts: [{ post_id: "9", author: { user_id: "123", username: "carlos", full_name: "Carlos", avatar_url: "javascript:alert(1)", is_verified: true }, media: [{ media_url: "https://cdn.x/i.jpg" }], caption: "bora", like_count: 4, comment_count: 1, is_liked: true, created_at: "2026-10-01T10:00:00Z" }] },
+    });
+    const r = await c.call("GET", "/api/feed");
+    const post = r.data.data[0];
+    assert.ok(!JSON.stringify(r.data).includes("123"));
+    assert.equal(post.author.photo, null);
+    assert.equal(post.image, "https://cdn.x/i.jpg");
+    assert.equal(post.liked, true);
+  });
+
+  test("comunidades: telefone de contato não sai do servidor", async () => {
+    const c = await loggedIn();
+    upstreamReply = () => ({ status: 200, body: { data: [{ id_comunidade: 3, nome: "Corrida", participantes: "12", max_participantes: "20", telefone_contato: "11999998888", is_member: false }] } });
+    const r = await c.call("GET", "/api/me/communities");
+    assert.ok(!JSON.stringify(r.data).includes("11999998888"));
+    assert.equal(r.data.data[0].participants, 12);
+    assert.equal(r.data.data[0].max, 20);
+  });
+
+  test("curtir: id validado; resposta só com o novo estado", async () => {
+    const c = await loggedIn();
+    assert.equal((await c.post("/api/feed/like", { id: "1/../../admin" })).status, 400);
+    upstreamReply = () => ({ status: 200, body: { success: true, isLiked: true } });
+    const r = await c.post("/api/feed/like", { id: "9" });
+    assert.deepEqual(r.data, { liked: true });
+    assert.equal(upstreamCalls.at(-1).url, "/api/user/posts/9/like");
+  });
+
+  test("entrar em comunidade: já membro → 409 com a mensagem; limite → 402", async () => {
+    const c = await loggedIn();
+    upstreamReply = () => ({ status: 409, body: { error: "Você já é membro desta comunidade." } });
+    let r = await c.post("/api/me/communities/join", { id: "3" });
+    assert.equal(r.status, 409);
+    assert.match(r.data.error, /já é membro/);
+    upstreamReply = () => ({ status: 403, body: { error: "FREE_LIMIT_REACHED", message: "Limite de comunidades atingido." } });
+    r = await c.post("/api/me/communities/join", { id: "3" });
+    assert.equal(r.status, 402);
+    assert.equal(upstreamCalls.at(-1).url, "/api/comunidades/3/entrar");
+  });
+});
+
 /* ---------- Cadastro ---------- */
 const validRegister = {
   nome: "Ana Silva",

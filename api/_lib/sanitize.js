@@ -99,4 +99,108 @@ export const stats = (s = {}) => {
   return { posts: num(d.posts), followers: num(d.followers), following: num(d.following) };
 };
 
+const isoDateTime = (v) => {
+  const d = new Date(v);
+  return Number.isNaN(d.getTime()) ? null : d.toISOString();
+};
+const numOrNull = (v) => (v == null || v === "" || !Number.isFinite(Number(v)) ? null : Number(v));
+
+/* ---------- Planos e cobrança ---------- */
+// Mesmo critério do app (planScreen.tsx): metadata.plan_type ou o nome do produto
+const plain = (v) => String(v || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+
+export const planType = (p = {}) => {
+  const t = plain(p.metadata?.plan_type);
+  const name = plain(p.name); // "Família" → "familia"
+  if (t === "family" || t === "familia" || name.includes("famil")) return "familia";
+  if (t === "premium" || name.includes("premium")) return "premium";
+  return "free";
+};
+
+export const catalogPlan = (p = {}) => ({
+  priceId: /^price_[A-Za-z0-9]{1,100}$/.test(p.stripe_price_id || "") ? p.stripe_price_id : null,
+  type: planType(p),
+  name: str(p.name, 80),
+  description: str(p.description, 300),
+  price: num(p.price),
+  currency: /^[a-z]{3}$/.test(p.currency || "") ? p.currency : "brl",
+  interval: ["day", "week", "month", "year"].includes(p.interval) ? p.interval : null,
+});
+
+const CARD_BRANDS = new Set(["visa", "mastercard", "amex", "elo", "hipercard", "discover", "diners", "jcb", "unionpay"]);
+// Cobrança: sem e-mail, CPF/CNPJ ou IDs da Stripe; do cartão só bandeira e final
+export const billing = (b = {}) => ({
+  hasSubscription: b.hasSubscription === true,
+  status: str(b.status, 30),
+  planName: str(b.planName, 80),
+  amount: numOrNull(b.amount),
+  currency: /^[a-z]{3}$/.test(b.currency || "") ? b.currency : "brl",
+  nextBillingDate: isoDate(b.nextBillingDate),
+  card: b.card && typeof b.card === "object"
+    ? {
+        brand: CARD_BRANDS.has(String(b.card.brand)) ? b.card.brand : "card",
+        last4: /^\d{4}$/.test(String(b.card.last4)) ? String(b.card.last4) : null,
+        expMonth: num(b.card.expMonth),
+        expYear: num(b.card.expYear),
+      }
+    : null,
+});
+
+/* ---------- Comunidade ---------- */
+export const profile = (p = {}) => {
+  const d = p.data || p;
+  return {
+    name: str(d.name || d.nome, 120),
+    username: str(d.username, 40),
+    photo: httpsUrl(d.photo || d.avatar_url),
+    banner: httpsUrl(d.banner || d.banner_url),
+    bio: str(d.bio, 300),
+    location: str(d.location, 80),
+    jobTitle: str(d.job_title, 80),
+  };
+};
+
+const postId = (v) => (/^\d{1,12}$/.test(String(v ?? "")) ? String(v) : null);
+
+export const ownPost = (p = {}) => ({
+  id: postId(p.id),
+  image: httpsUrl(p.image_url),
+  caption: str(p.legenda || p.caption, 600),
+  likes: num(p.likes_count),
+  comments: num(p.comments_count),
+  createdAt: isoDateTime(p.created_at),
+});
+
+// Feed: só o que aparece no card; nada de IDs internos dos autores
+export const feedPost = (p = {}) => ({
+  id: postId(p.post_id),
+  author: {
+    name: str(p.author?.full_name, 120),
+    username: str(p.author?.username, 40),
+    photo: httpsUrl(p.author?.avatar_url),
+    verified: p.author?.is_verified === true,
+  },
+  image: httpsUrl(p.media?.[0]?.media_url),
+  caption: str(p.caption, 600),
+  likes: num(p.like_count),
+  comments: num(p.comment_count),
+  liked: p.is_liked === true,
+  createdAt: isoDateTime(p.created_at),
+});
+
+// Telefone de contato e demais campos internos não saem do servidor
+export const community = (c = {}) => ({
+  id: postId(c.id_comunidade),
+  name: str(c.nome, 120),
+  description: str(c.descricao, 500),
+  image: httpsUrl(c.imageurl),
+  participants: num(c.participantes),
+  max: numOrNull(c.max_participantes),
+  category: str(c.categoria, 60),
+  type: str(c.tipo_comunidade, 40),
+  eventDate: isoDate(c.data_evento),
+  location: str(c.local_inicio, 120),
+  isMember: c.is_member === true,
+});
+
 export const list = (v, fn, max) => (Array.isArray(v) ? v.slice(0, max).map(fn) : []);

@@ -1,12 +1,12 @@
 /* BFF — rotas (allowlist). Qualquer outro caminho em /api responde 404. */
 import { hashKey } from "./crypto.js";
-import { endSession, ensureCsrf, readSession, startSession } from "./guards.js";
+import { endSession, ensureCsrf, readSession, siteOrigin, startSession } from "./guards.js";
 import { HttpError, readJson, send } from "./http.js";
 import { log } from "./log.js";
 import { consume, LIMITS } from "./rate-limit.js";
 import * as clean from "./sanitize.js";
 import {
-  digits, firstIssue, idActionSchema, loginSchema, recoveryRequestSchema, recoveryResetSchema,
+  checkoutSchema, digits, firstIssue, idActionSchema, loginSchema, recoveryRequestSchema, recoveryResetSchema,
   recoveryVerifySchema, registerSchema, trainingsQuerySchema,
 } from "./schemas.js";
 import { callUpstream, upstreamMessage } from "./upstream.js";
@@ -195,6 +195,100 @@ async function cancelAppointment(ctx) {
   return send(ctx.res, 200, { ok: true });
 }
 
+/* ---------- Plano e assinatura ---------- */
+// Só abrimos páginas de pagamento destes domínios (mesma lista do app)
+const STRIPE_HOSTS = { checkout: ["checkout.stripe.com"], portal: ["billing.stripe.com"] };
+const trustedUrl = (v, hosts) => {
+  try {
+    const u = new URL(String(v));
+    return u.protocol === "https:" && hosts.includes(u.hostname) ? u.href : null;
+  } catch {
+    return null;
+  }
+};
+
+async function catalog(ctx) {
+  const r = await up(ctx, { path: "/plans" });
+  if (!r.ok || !Array.isArray(r.data)) throw new HttpError(502, "Não foi possível carregar os planos agora.");
+  return clean.list(r.data, clean.catalogPlan, 10);
+}
+
+async function plans(ctx) {
+  if (!readSession(ctx.req, ctx.cfg)) throw new HttpError(401, "Sessão expirada. Entre novamente.");
+  return send(ctx.res, 200, { data: await catalog(ctx) });
+}
+
+async function billing(ctx) {
+  const { data } = await authed(ctx, { path: "/user/billing-info" });
+  return send(ctx.res, 200, clean.billing(data));
+}
+
+async function checkout(ctx) {
+  const { priceId, quantity = 1 } = await body(ctx, checkoutSchema);
+  // O preço precisa existir no catálogo e ser de um plano pago
+  const plan = (await catalog(ctx)).find((p) => p.priceId === priceId && p.type !== "free");
+  if (!plan) throw new HttpError(400, "Plano inválido.");
+  const seats = plan.type === "familia" ? Math.min(10, Math.max(2, quantity)) : 1;
+  const origin = typeof ctx.req.headers.origin === "string" ? ctx.req.headers.origin : siteOrigin(ctx.req);
+  const { data } = await action(
+    ctx,
+    { method: "POST", path: "/create-checkout-session", body: { priceId, quantity: seats, returnUrl: `${origin}/dashboard/plano?checkout=retorno` } },
+    { rule: "checkout" }
+  );
+  const url = trustedUrl(data.url, STRIPE_HOSTS.checkout);
+  if (!url) throw new HttpError(502, "Não foi possível iniciar o pagamento agora.");
+  log("info", "billing.checkout_started", { ip: ctx.ip, plan: plan.type });
+  return send(ctx.res, 200, { url });
+}
+
+async function portal(ctx) {
+  const { data } = await action(ctx, { method: "POST", path: "/billing/portal" }, { rule: "checkout" });
+  const url = trustedUrl(data.url, STRIPE_HOSTS.portal);
+  if (!url) throw new HttpError(502, "Não foi possível abrir o portal de assinatura agora.");
+  return send(ctx.res, 200, { url });
+}
+
+/* ---------- Comunidade ---------- */
+// O ID vem da sessão cifrada, nunca do cliente (evita IDOR)
+const uidPath = (ctx, suffix = "") => {
+  const s = readSession(ctx.req, ctx.cfg);
+  if (!s?.uid) throw new HttpError(401, "Sessão expirada. Entre novamente.");
+  return `/user/${encodeURIComponent(s.uid)}${suffix}`;
+};
+
+async function profile(ctx) {
+  const { data } = await authed(ctx, { path: uidPath(ctx) });
+  return send(ctx.res, 200, clean.profile(data));
+}
+
+async function myPosts(ctx) {
+  const { data } = await authed(ctx, { path: uidPath(ctx, "/posts") });
+  return send(ctx.res, 200, { data: clean.list(data.data, clean.ownPost, 60).filter((p) => p.id) });
+}
+
+async function feed(ctx) {
+  const { data } = await authed(ctx, { path: "/feed" });
+  return send(ctx.res, 200, { data: clean.list(data.posts, clean.feedPost, 30).filter((p) => p.id) });
+}
+
+async function communities(ctx) {
+  const { data } = await authed(ctx, { path: "/comunidades" });
+  return send(ctx.res, 200, { data: clean.list(data.data, clean.community, 60).filter((c) => c.id) });
+}
+
+async function likePost(ctx) {
+  const { id } = await body(ctx, idActionSchema);
+  const { data } = await action(ctx, { method: "POST", path: `/user/posts/${id}/like` });
+  return send(ctx.res, 200, { liked: data.isLiked === true });
+}
+
+async function joinCommunity(ctx) {
+  const { id } = await body(ctx, idActionSchema);
+  await action(ctx, { method: "POST", path: `/comunidades/${id}/entrar` });
+  log("info", "community.joined", { ip: ctx.ip });
+  return send(ctx.res, 200, { ok: true });
+}
+
 async function trainings(ctx) {
   const parsed = trainingsQuerySchema.safeParse(Object.fromEntries(ctx.url.searchParams));
   if (!parsed.success) throw new HttpError(400, "Filtro inválido.");
@@ -242,4 +336,14 @@ export const ROUTES = {
   "GET /api/me/health": { handler: health },
   "GET /api/me/training-filters": { handler: trainingFilters },
   "POST /api/me/appointments/cancel": { handler: cancelAppointment, mutating: true },
+  "GET /api/plans": { handler: plans },
+  "GET /api/me/billing": { handler: billing },
+  "POST /api/me/billing/checkout": { handler: checkout, mutating: true },
+  "POST /api/me/billing/portal": { handler: portal, mutating: true },
+  "GET /api/me/profile": { handler: profile },
+  "GET /api/me/posts": { handler: myPosts },
+  "GET /api/feed": { handler: feed },
+  "POST /api/feed/like": { handler: likePost, mutating: true },
+  "GET /api/me/communities": { handler: communities },
+  "POST /api/me/communities/join": { handler: joinCommunity, mutating: true },
 };

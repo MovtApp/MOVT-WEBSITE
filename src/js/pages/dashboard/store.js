@@ -40,6 +40,12 @@ export const api = {
   plan: (opts) => load("plan", () => request("/me/plan"), opts),
   stats: () => load("stats", () => request("/me/stats")),
   health: () => load("health", () => request("/me/health")),
+  plans: () => load("plans", () => request("/plans").then(list)),
+  billing: (opts) => load("billing", () => request("/me/billing"), opts),
+  profile: () => load("profile", () => request("/me/profile")),
+  posts: () => load("posts", () => request("/me/posts").then(list)),
+  feed: () => load("feed", () => request("/feed").then(list)),
+  communities: (opts) => load("communities", () => request("/me/communities").then(list), opts),
 };
 
 // Ações (POST com CSRF). Erros de sessão também levam ao login.

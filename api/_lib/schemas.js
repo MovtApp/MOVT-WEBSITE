@@ -77,6 +77,12 @@ export const trainingsQuerySchema = z.strictObject({
 // Ações sobre um recurso do backend: só IDs numéricos (nunca caminho livre)
 export const idActionSchema = z.strictObject({ id: z.string().regex(/^\d{1,12}$/, "Item inválido.") });
 
+// Assinatura: o priceId ainda é conferido contra o catálogo da Stripe no handler
+export const checkoutSchema = z.strictObject({
+  priceId: z.string().regex(/^price_[A-Za-z0-9]{1,100}$/, "Plano inválido."),
+  quantity: z.number().int().min(1).max(10).optional(),
+});
+
 // Primeiro erro → { error, field } amigável para o formulário
 export function firstIssue(err) {
   const issue = err.issues?.[0];

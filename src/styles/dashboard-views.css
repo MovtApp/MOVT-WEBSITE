@@ -368,6 +368,14 @@
 .sub-status.warn { color: #ffd76a; background: rgba(255, 196, 0, 0.1); }
 .sub-status.off { color: #ff8a8a; background: rgba(255, 107, 107, 0.1); }
 
+.sub-status.muted { color: rgba(255, 255, 255, 0.75); background: rgba(255, 255, 255, 0.08); }
+.plan-hero > .skeleton, .plan-hero > .state { grid-column: 1 / -1; }
+.sk-hero { min-height: 220px; }
+.sk-usage { min-height: 96px; }
+.sk-plan { min-height: 460px; border-radius: 26px; }
+.sk-post { min-height: 420px; border-radius: 24px; }
+.sk-tile { aspect-ratio: 1; min-height: 0; border-radius: 18px; }
+.sk-comm { min-height: 360px; border-radius: 24px; }
 .usage { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
 .usage-item { padding: 18px; border-radius: 18px; background: #141414; }
 .usage-item p { display: flex; justify-content: space-between; font-family: var(--f-small); font-size: 13px; color: var(--muted); margin-bottom: 10px; }
@@ -459,17 +467,17 @@
 .profile-stats span { font-family: var(--f-small); font-size: 11px; color: var(--muted); }
 
 .feed { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; align-items: start; }
-.post { border-radius: 24px; background: var(--card); overflow: hidden; display: flex; flex-direction: column; }
-.post-head { display: flex; align-items: center; gap: 10px; padding: 14px 16px; }
-.post-head img, .post-head .ph { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; background: #262626; display: grid; place-items: center; font-weight: 700; font-size: 14px; flex: 0 0 auto; }
-.post-head b { display: flex; align-items: center; gap: 4px; font-size: 14px; }
-.post-head b .ic { width: 15px; height: 15px; color: var(--lime); }
-.post-head small { display: block; font-family: var(--f-small); font-size: 11px; color: var(--muted); }
-.post-img { aspect-ratio: 1; background: #1f1f1f; }
-.post-img img { width: 100%; height: 100%; object-fit: cover; }
-.post-body { padding: 12px 16px 16px; }
-.post-actions { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
-.post-actions button, .post-actions span {
+.fpost { border-radius: 24px; background: var(--card); overflow: hidden; display: flex; flex-direction: column; }
+.fpost-head { display: flex; align-items: center; gap: 10px; padding: 14px 16px; }
+.fpost-head img, .fpost-head .ph { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; background: #262626; display: grid; place-items: center; font-weight: 700; font-size: 14px; flex: 0 0 auto; }
+.fpost-head b { display: flex; align-items: center; gap: 4px; font-size: 14px; }
+.fpost-head b .ic { width: 15px; height: 15px; color: var(--lime); }
+.fpost-head small { display: block; font-family: var(--f-small); font-size: 11px; color: var(--muted); }
+.fpost-img { aspect-ratio: 1; background: #1f1f1f; }
+.fpost-img img { width: 100%; height: 100%; object-fit: cover; }
+.fpost-body { padding: 12px 16px 16px; }
+.fpost-actions { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+.fpost-actions button, .fpost-actions span {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -480,14 +488,14 @@
   font-size: 13px;
   color: rgba(255, 255, 255, 0.8);
 }
-.post-actions button:hover { background: rgba(255, 255, 255, 0.05); }
-.post-actions .ic { width: 19px; height: 19px; }
+.fpost-actions button:hover { background: rgba(255, 255, 255, 0.05); }
+.fpost-actions .ic { width: 19px; height: 19px; }
 .like.on { color: #ff6b81; }
 .like.on .ic { fill: currentColor; }
 .like.pop .ic { animation: pop 0.4s var(--ease); }
 @keyframes pop { 50% { transform: scale(1.3); } }
-.post-caption { font-size: 14px; line-height: 1.5; color: rgba(255, 255, 255, 0.85); overflow-wrap: anywhere; }
-.post-caption b { margin-right: 6px; }
+.fpost-caption { font-size: 14px; line-height: 1.5; color: rgba(255, 255, 255, 0.85); overflow-wrap: anywhere; }
+.fpost-caption b { margin-right: 6px; }
 
 .posts { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
 .tile { position: relative; aspect-ratio: 1; border-radius: 18px; overflow: hidden; background: #1f1f1f; }

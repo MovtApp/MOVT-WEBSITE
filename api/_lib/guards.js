@@ -39,6 +39,12 @@ export function assertSameOrigin(req, cfg) {
   throw new HttpError(403, "Origem não permitida.");
 }
 
+// Origem pública do site (para URLs de retorno). Em rotas que alteram dados,
+// assertSameOrigin já garantiu que ela é o próprio site.
+export function siteOrigin(req) {
+  return `${isSecure(req) ? "https" : "http"}://${host(req)}`;
+}
+
 export function readCookies(req) {
   return parseCookies(req.headers.cookie);
 }
