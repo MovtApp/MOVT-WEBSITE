@@ -74,6 +74,9 @@ export const trainingsQuerySchema = z.strictObject({
   daily: z.enum(["1"]).optional(),
 });
 
+// Ações sobre um recurso do backend: só IDs numéricos (nunca caminho livre)
+export const idActionSchema = z.strictObject({ id: z.string().regex(/^\d{1,12}$/, "Item inválido.") });
+
 // Primeiro erro → { error, field } amigável para o formulário
 export function firstIssue(err) {
   const issue = err.issues?.[0];

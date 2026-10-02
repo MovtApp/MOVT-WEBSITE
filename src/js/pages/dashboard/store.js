@@ -35,6 +35,7 @@ export const api = {
   trainings: ({ specialty = "", daily = false } = {}) =>
     load(`trainings:${specialty}:${daily}`, () =>
       request("/me/trainings", { params: { specialty, daily: daily ? "1" : "" } }).then(list)),
+  trainingFilters: () => load("training-filters", () => request("/me/training-filters")),
   appointments: (opts) => load("appointments", () => request("/me/appointments").then(list), opts),
   plan: (opts) => load("plan", () => request("/me/plan"), opts),
   stats: () => load("stats", () => request("/me/stats")),

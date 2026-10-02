@@ -209,10 +209,23 @@ describe("sessão e dados do usuário", () => {
     await c.post("/api/auth/login", { email: "ana@x.com", senha: "segredo123" });
     upstreamReply = () => ({
       status: 200,
-      body: { data: [{ id_agendamento: 9, id_trainer: 7, data_agendamento: "2026-10-05T03:00:00Z", hora_inicio: "07:30:00", status: "confirmado", notas: "lesão no joelho", trainer_name: "Carlos", trainer_email: "carlos@x.com" }] },
+      body: { data: [{ id_agendamento: 9, id_trainer: 7, id_usuario: 42, data_agendamento: "2026-10-05T03:00:00Z", hora_inicio: "07:30:00", hora_fim: "08:30:00", status: "confirmado", notas: "lesão no joelho", trainer_name: "Carlos", trainer_email: "carlos@x.com", trainer_avatar: "https://cdn.x/c.jpg", avaliado: false }] },
     });
     const r = await c.call("GET", "/api/me/appointments");
-    assert.deepEqual(r.data.data, [{ date: "2026-10-05", start: "07:30", status: "confirmado", trainer: "Carlos" }]);
+    assert.deepEqual(r.data.data, [{ id: "9", date: "2026-10-05", start: "07:30", end: "08:30", status: "confirmado", trainer: "Carlos", trainerPhoto: "https://cdn.x/c.jpg", rated: false }]);
+  });
+
+  test("treinos: exercícios em texto JSON viram lista limpa", async () => {
+    const c = await loggedIn();
+    upstreamReply = () => ({
+      status: 200,
+      body: { data: [{ id_treino: 1, nome: "Pernas", nivel: "Iniciante", secao_home: "x", created_at: "2026", exercicios: JSON.stringify([{ nome: "Agachamento", series: 4, repeticoes: 10, id_interno: 99 }, { nome: "" }]) }] },
+    });
+    const r = await c.call("GET", "/api/me/trainings");
+    const t = r.data.data[0];
+    assert.equal(t.level, "Iniciante");
+    assert.deepEqual(t.exercises, [{ name: "Agachamento", detail: "4 × 10" }]);
+    assert.ok(!("secao_home" in t) && !("created_at" in t));
   });
 
   test("estatísticas usam o ID da sessão cifrada (sem IDOR)", async () => {
@@ -252,6 +265,78 @@ describe("sessão e dados do usuário", () => {
     await c.post("/api/auth/logout");
     assert.equal(upstreamCalls.at(-1).url, "/api/auth/logout");
     assert.equal(upstreamCalls.at(-1).headers.authorization, "Bearer sid-123");
+    assert.ok(!c.jar.has("movt_sid"));
+  });
+});
+
+/* ---------- Ações do painel ---------- */
+// Sessão já aberta (cookie cifrado com a chave do BFF), sem passar pelo login:
+// assim o rate limit de login não interfere nestes testes
+async function loggedIn({ uid = 42 } = {}) {
+  const { seal } = await import("../api/_lib/crypto.js");
+  const c = client();
+  c.jar.set("movt_sid", seal({ sid: "sid-123", uid, iat: Date.now() }, Buffer.from(process.env.BFF_SESSION_KEY, "base64")));
+  await c.call("GET", "/api/auth/session"); // obtém o cookie CSRF
+  upstreamCalls = [];
+  return c;
+}
+
+describe("ações: cancelar agendamento", () => {
+  test("sem CSRF → 403 e nada chega ao backend", async () => {
+    const c = await loggedIn();
+    const r = await c.call("POST", "/api/me/appointments/cancel", {
+      body: { id: "12" },
+      headers: { "Content-Type": "application/json", Origin: origin },
+    });
+    assert.equal(r.status, 403);
+    assert.equal(upstreamCalls.length, 0);
+  });
+
+  test("id fora do formato (caminho/injeção) → 400 sem chamar o backend", async () => {
+    const c = await loggedIn();
+    for (const id of ["../user/1", "12?x=1", "abc", ""]) {
+      const r = await c.post("/api/me/appointments/cancel", { id });
+      assert.equal(r.status, 400, id);
+    }
+    assert.equal(upstreamCalls.length, 0);
+  });
+
+  test("sucesso: PUT com status cancelado (o backend confere o dono)", async () => {
+    const c = await loggedIn();
+    upstreamReply = () => ({ status: 200, body: { success: true, appointment: { notas: "privado" } } });
+    const r = await c.post("/api/me/appointments/cancel", { id: "12" });
+    assert.equal(r.status, 200);
+    assert.deepEqual(r.data, { ok: true });
+    const call = upstreamCalls.at(-1);
+    assert.equal(call.method, "PUT");
+    assert.equal(call.url, "/api/appointments/12");
+    assert.deepEqual(call.body, { status: "cancelado" });
+    assert.equal(call.headers.authorization, "Bearer sid-123");
+  });
+
+  test("backend nega (403 de permissão) → 409 e a sessão continua", async () => {
+    const c = await loggedIn();
+    upstreamReply = () => ({ status: 403, body: { error: "Sem permissão para atualizar este agendamento." } });
+    const r = await c.post("/api/me/appointments/cancel", { id: "12" });
+    assert.equal(r.status, 409);
+    assert.match(r.data.error, /Sem permissão/);
+    assert.ok(c.jar.has("movt_sid"), "permissão negada não pode deslogar");
+  });
+
+  test("limite do plano (FREE_LIMIT_REACHED) → 402 com código", async () => {
+    const c = await loggedIn();
+    upstreamReply = () => ({ status: 403, body: { error: "FREE_LIMIT_REACHED", message: "Você atingiu o limite de 2 comunidades.", used: 2, limit: 2 } });
+    const r = await c.post("/api/me/appointments/cancel", { id: "12" });
+    assert.equal(r.status, 402);
+    assert.equal(r.data.code, "PLAN_LIMIT");
+    assert.ok(c.jar.has("movt_sid"));
+  });
+
+  test("sessão inválida no backend → 401 e cookies apagados", async () => {
+    const c = await loggedIn();
+    upstreamReply = () => ({ status: 401, body: {} });
+    const r = await c.post("/api/me/appointments/cancel", { id: "12" });
+    assert.equal(r.status, 401);
     assert.ok(!c.jar.has("movt_sid"));
   });
 });

@@ -6,7 +6,7 @@ import { log } from "./log.js";
 import { consume, LIMITS } from "./rate-limit.js";
 import * as clean from "./sanitize.js";
 import {
-  digits, firstIssue, loginSchema, recoveryRequestSchema, recoveryResetSchema,
+  digits, firstIssue, idActionSchema, loginSchema, recoveryRequestSchema, recoveryResetSchema,
   recoveryVerifySchema, registerSchema, trainingsQuerySchema,
 } from "./schemas.js";
 import { callUpstream, upstreamMessage } from "./upstream.js";
@@ -161,6 +161,40 @@ async function authed(ctx, opts) {
   return { data: r.data, session: s };
 }
 
+// Ações do painel: sessão obrigatória + limite por sessão. Erros "de negócio"
+// do backend (limite do plano, sem permissão, já encerrado) NÃO derrubam a
+// sessão: viram 402/409 com mensagem curta. Só 401 (ou conta inativa) desloga.
+async function action(ctx, opts, { rule = "action" } = {}) {
+  const s = readSession(ctx.req, ctx.cfg);
+  if (!s) throw new HttpError(401, "Sessão expirada. Entre novamente.");
+  await limit(ctx, rule, s.sid);
+  const r = await up(ctx, { ...opts, sid: s.sid });
+  if (r.status === 401 || (r.status === 403 && r.data?.error === "USER_INACTIVE")) {
+    endSession(ctx.req, ctx.res);
+    throw new HttpError(401, "Sessão expirada. Entre novamente.");
+  }
+  if (r.status === 403 && r.data?.error === "FREE_LIMIT_REACHED") {
+    const msg = typeof r.data.message === "string" && r.data.message.length <= 200 ? r.data.message : "Você atingiu o limite do seu plano.";
+    throw new HttpError(402, msg, { code: "PLAN_LIMIT" });
+  }
+  if (r.status === 404) throw new HttpError(404, "Item não encontrado.");
+  if (r.status === 429) throw new HttpError(429, "Muitas tentativas. Aguarde alguns minutos.");
+  if (!r.ok) throw new HttpError(409, upstreamMessage(r.data, "Não foi possível concluir a ação."));
+  return { data: r.data, session: s };
+}
+
+async function trainingFilters(ctx) {
+  const { data } = await authed(ctx, { path: "/treino-niveis" });
+  return send(ctx.res, 200, { levels: clean.names(data.data, 10) });
+}
+
+async function cancelAppointment(ctx) {
+  const { id } = await body(ctx, idActionSchema);
+  await action(ctx, { method: "PUT", path: `/appointments/${id}`, body: { status: "cancelado" } });
+  log("info", "appointment.cancelled", { ip: ctx.ip });
+  return send(ctx.res, 200, { ok: true });
+}
+
 async function trainings(ctx) {
   const parsed = trainingsQuerySchema.safeParse(Object.fromEntries(ctx.url.searchParams));
   if (!parsed.success) throw new HttpError(400, "Filtro inválido.");
@@ -206,4 +240,6 @@ export const ROUTES = {
   "GET /api/me/plan": { handler: planStatus },
   "GET /api/me/stats": { handler: stats },
   "GET /api/me/health": { handler: health },
+  "GET /api/me/training-filters": { handler: trainingFilters },
+  "POST /api/me/appointments/cancel": { handler: cancelAppointment, mutating: true },
 };

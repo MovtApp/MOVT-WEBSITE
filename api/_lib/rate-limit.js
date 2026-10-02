@@ -79,6 +79,9 @@ export const LIMITS = {
   registerEmail: { limit: 5, windowMs: 15 * MIN },
   recoveryIp: { limit: 10, windowMs: 15 * MIN },
   recoveryEmail: { limit: 5, windowMs: 15 * MIN },
+  // Ações do painel (cancelar, curtir, entrar em comunidade...), por sessão
+  action: { limit: 60, windowMs: 5 * MIN },
+  checkout: { limit: 10, windowMs: 15 * MIN },
 };
 
 export { MemoryStore };
