@@ -19,7 +19,8 @@ export default [
     languageOptions: { ecmaVersion: 2019, sourceType: "script", globals: globals.browser },
   },
   {
-    files: ["*.config.js"],
-    languageOptions: { sourceType: "module", globals: globals.node },
+    files: ["*.config.js", "api/**/*.js", "scripts/**/*.mjs", "tests/**/*.js"],
+    languageOptions: { ecmaVersion: 2024, sourceType: "module", globals: globals.node },
+    rules: { "no-empty": ["error", { allowEmptyCatch: true }] },
   },
 ];

@@ -7,7 +7,7 @@ import { digits, isEmail, maskCNPJ, maskCPF, maskPhone } from "../utils/masks.js
 
 (() => {
   // Já logado → vai direto ao dashboard
-  if (session.id) {
+  if (session.hinted) {
     location.replace(ROUTES.dashboard);
     return;
   }
@@ -70,6 +70,9 @@ import { digits, isEmail, maskCNPJ, maskCPF, maskPhone } from "../utils/masks.js
     form.querySelectorAll("input").forEach((i) => i.classList.toggle("invalid", names.includes(i.name)));
   };
 
+  // <input type="date"> entrega AAAA-MM-DD; a API espera DD/MM/AAAA
+  const toBrDate = (iso) => (/^\d{4}-\d{2}-\d{2}$/.test(iso) ? iso.split("-").reverse().join("/") : iso);
+
   /* ---------- Documento e telefone ---------- */
   const reg = panels.register;
   const docInput = reg.elements.cpf_cnpj;
@@ -105,7 +108,7 @@ import { digits, isEmail, maskCNPJ, maskCPF, maskPhone } from "../utils/masks.js
       msg(f, "Login efetuado! Redirecionando…", true);
       location.href = ROUTES.dashboard;
     } catch (err) {
-      msg(f, err.status === 401 || err.status === 400 ? err.message || "E-mail ou senha inválidos." : err.message);
+      msg(f, err.message || "E-mail ou senha inválidos.");
       busy(f, false);
     }
   });
@@ -121,8 +124,11 @@ import { digits, isEmail, maskCNPJ, maskCPF, maskPhone } from "../utils/masks.js
     if (docDigits.length !== (v.tipo_documento === "CPF" ? 11 : 14)) bad.push("cpf_cnpj");
     if (!v.data_nascimento) bad.push("data_nascimento");
     if (digits(v.telefone || "").length < 10) bad.push("telefone");
-    if ((v.senha || "").length < 6) bad.push("senha");
+    if ((v.senha || "").length < 8) bad.push("senha");
+    if (!v.acceptTerms) bad.push("acceptTerms");
     markInvalid(reg, bad);
+    if (bad.length === 1 && bad[0] === "acceptTerms")
+      return msg(reg, "Para criar a conta, aceite os Termos de Uso e a Política de Privacidade.");
     if (bad.length) return msg(reg, "Revise os campos destacados.");
 
     msg(reg, "");
@@ -133,15 +139,23 @@ import { digits, isEmail, maskCNPJ, maskCPF, maskPhone } from "../utils/masks.js
         email: v.email.trim(),
         senha: v.senha,
         cpf_cnpj: v.cpf_cnpj,
-        data_nascimento: v.data_nascimento,
+        data_nascimento: toBrDate(v.data_nascimento),
         telefone: v.telefone,
         tipo_documento: v.tipo_documento,
+        acceptTerms: true,
+        acceptPrivacy: true,
       });
       reg.reset();
+      if (data?.authenticated) {
+        msg(reg, "Conta criada! Redirecionando…", true);
+        location.href = ROUTES.dashboard;
+        return;
+      }
       show("login");
       panels.login.elements.email.value = v.email.trim();
-      msg(panels.login, (data && data.message) || "Conta criada! Faça login para continuar.", true);
+      msg(panels.login, data?.message || "Conta criada! Faça login para continuar.", true);
     } catch (err) {
+      if (err.field) markInvalid(reg, [err.field]);
       msg(reg, err.message);
     } finally {
       busy(reg, false);
@@ -175,7 +189,7 @@ import { digits, isEmail, maskCNPJ, maskCPF, maskPhone } from "../utils/masks.js
     const newPassword = rec.elements.newPassword.value;
     if (!isEmail(email)) { markInvalid(rec, ["email"]); return msg(rec, "Informe um e-mail válido."); }
     if (step === 2 && !code) { markInvalid(rec, ["code"]); return msg(rec, "Informe o código recebido."); }
-    if (step === 3 && newPassword.length < 6) { markInvalid(rec, ["newPassword"]); return msg(rec, "A senha deve ter pelo menos 6 caracteres."); }
+    if (step === 3 && newPassword.length < 8) { markInvalid(rec, ["newPassword"]); return msg(rec, "A senha deve ter pelo menos 8 caracteres."); }
     markInvalid(rec, []);
     msg(rec, "");
     busy(rec, true);

@@ -200,3 +200,26 @@
   .auth-title { font-size: 26px; }
   .row-2 { grid-template-columns: 1fr; }
 }
+
+/* Consentimento LGPD (cadastro) */
+.consent {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 4px 0 2px;
+  font-family: var(--f-small);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+  cursor: pointer;
+}
+.consent input {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  accent-color: var(--lime);
+  cursor: pointer;
+}
+.consent input.invalid { outline: 2px solid #ff6b6b; outline-offset: 2px; }
+.consent a { color: var(--lime); text-decoration: underline; text-underline-offset: 2px; }

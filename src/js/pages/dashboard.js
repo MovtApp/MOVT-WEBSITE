@@ -1,12 +1,12 @@
 /* MOVT web — dashboard */
 import { request } from "../core/api.js";
-import { logout } from "../core/auth.js";
+import { getSession, logout } from "../core/auth.js";
 import { ROUTES } from "../core/config.js";
 import { session } from "../core/session.js";
 import { $, $$, esc, safeUrl } from "../utils/dom.js";
 
 (() => {
-  if (!session.id) return; // public/js/auth-guard.js já redirecionou
+  if (!session.hinted) return; // public/scripts/auth-guard.js já redirecionou
 
   // Fallback idêntico ao da Home do app quando /treinos não retorna nada
   const EXERCISE_FALLBACK = [
@@ -22,7 +22,7 @@ import { $, $$, esc, safeUrl } from "../utils/dom.js";
   /* ---------- Sessão inválida → login ---------- */
   const handleAuthError = (err) => {
     if (err && (err.status === 401 || err.status === 403)) {
-      session.clear();
+      // O BFF já apagou os cookies de sessão
       location.replace(ROUTES.auth);
       return true;
     }
@@ -31,7 +31,7 @@ import { $, $$, esc, safeUrl } from "../utils/dom.js";
 
   /* ---------- Usuário ---------- */
   const renderUser = (u) => {
-    const name = (u?.name || u?.nome || "").trim();
+    const name = (u?.name || "").trim();
     $("#user-first").textContent = name ? name.split(/\s+/)[0] : "atleta";
     $("#um-name").textContent = name || "Usuário MOVT";
     $("#um-email").textContent = u?.email || "";
@@ -125,17 +125,8 @@ import { $, $$, esc, safeUrl } from "../utils/dom.js";
   };
   renderRadar([0.72, 0.58, 0.45, 0.66, 0.8, 0.52]);
 
-  /* ---------- Treinos ---------- */
-  const mapTraining = (t) => ({
-    id: String(t.id ?? t.id_treino ?? Math.random()),
-    title: t.title || t.nome || "Treino",
-    description: t.description || t.descricao || "",
-    calories: t.calories || t.calorias || "",
-    minutes: t.minutes || t.duracao || "",
-    sets: t.sets || "3 séries",
-    category: t.category || t.categoria || "Fitness",
-    imageUrl: safeUrl(t.image_url || t.imageUrl || t.imageurl || ""),
-  });
+  /* ---------- Treinos (já normalizados e filtrados pelo BFF) ---------- */
+  const mapTraining = (t) => ({ ...t, sets: "3 séries", imageUrl: safeUrl(t.imageUrl || "") });
 
   const openSheet = (t, kind) => {
     $("#sheet-img").src = t.imageUrl || (kind === "plan" ? DEFAULT_PLAN_IMG : DEFAULT_IMG);
@@ -192,7 +183,7 @@ import { $, $$, esc, safeUrl } from "../utils/dom.js";
   const loadPopular = async (specialty) => {
     $("#popular").innerHTML = `<div class="skeleton" style="aspect-ratio:3/4"></div>`.repeat(4);
     try {
-      const resp = await request("/treinos", { params: { specialty: specialty || undefined } });
+      const resp = await request("/me/trainings", { params: { specialty } });
       const list = (resp?.data || []).map(mapTraining);
       renderPopular(list.length ? list : EXERCISE_FALLBACK);
     } catch (err) {
@@ -209,7 +200,7 @@ import { $, $$, esc, safeUrl } from "../utils/dom.js";
 
   const loadDaily = async () => {
     try {
-      const resp = await request("/treinos", { params: { isDaily: true } });
+      const resp = await request("/me/trainings", { params: { daily: "1" } });
       renderDaily((resp?.data || []).map(mapTraining).slice(0, 6));
     } catch (err) {
       if (handleAuthError(err)) return;
@@ -221,11 +212,12 @@ import { $, $$, esc, safeUrl } from "../utils/dom.js";
   const loadAppointments = async () => {
     const el = $("#appts");
     try {
-      const resp = await request("/appointments", { params: { role: "client" } });
+      const resp = await request("/me/appointments");
       const now = new Date();
+      // date chega como AAAA-MM-DD: monta no fuso local para não "voltar" um dia
       const list = (Array.isArray(resp?.data) ? resp.data : [])
-        .filter((a) => a.status !== "cancelado")
-        .map((a) => ({ ...a, _date: new Date(a.data_agendamento || a.data) }))
+        .filter((a) => a.status !== "cancelado" && a.date)
+        .map((a) => ({ ...a, _date: new Date(`${a.date}T00:00:00`) }))
         .filter((a) => !isNaN(a._date));
 
       apptDays = new Set(list.map((a) => dayKey(a._date)));
@@ -240,13 +232,10 @@ import { $, $$, esc, safeUrl } from "../utils/dom.js";
       }
       el.innerHTML = upcoming
         .map((a) => {
-          const who = a.nome_trainer || a.trainer_nome || a.personal_nome || a.nome_personal || a.trainer?.nome || a.nome_pj || "Personal trainer";
-          const hour = a.horario || a.hora_inicio || a.hora || a._date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-          const place = a.local || a.nome_academia || a.academia?.nome || a.modalidade || "";
           const st = String(a.status || "pendente").toLowerCase();
           return `<li class="appt">
             <div class="appt-date"><b>${a._date.getDate()}</b><small>${a._date.toLocaleDateString("pt-BR", { month: "short" }).replace(".", "")}</small></div>
-            <div class="appt-info"><h4>${esc(who)}</h4><p>${esc([String(hour).slice(0, 5), place].filter(Boolean).join(" · "))}</p></div>
+            <div class="appt-info"><h4>${esc(a.trainer)}</h4><p>${esc(a.start || "")}</p></div>
             <span class="status ${esc(st.normalize("NFD").replace(/[̀-ͯ]/g, ""))}">${esc(st)}</span>
           </li>`;
         })
@@ -265,26 +254,22 @@ import { $, $$, esc, safeUrl } from "../utils/dom.js";
     const rows = [];
     if (limits?.agendamentos) rows.push(["Agendamentos", limits.agendamentos]);
     if (limits?.comunidades) rows.push(["Comunidades", limits.comunidades]);
-    $("#limits").innerHTML =
-      rows
-        .map(([label, { used = 0, limit }]) => {
-          const pct = limit ? Math.min(100, (used / limit) * 100) : 100;
-          return `<div class="limit"><p>${label}<b>${esc(used)}${limit ? ` / ${esc(limit)}` : " · ilimitado"}</b></p><div class="bar"><i data-w="${Number(pct) || 0}"></i></div></div>`;
-        })
-        .join("") +
-      (limits?.dietas
-        ? `<div class="limit"><p>Dietas<b>${limits.dietas.canCreate ? "Liberado" : "Bloqueado"}</b></p></div>`
-        : "");
+    if (limits?.dietas) rows.push(["Dietas", limits.dietas]);
+    $("#limits").innerHTML = rows
+      .map(([label, { used = 0, limit }]) => {
+        const pct = limit ? Math.min(100, (used / limit) * 100) : 100;
+        return `<div class="limit"><p>${label}<b>${esc(used)}${limit ? ` / ${esc(limit)}` : " · ilimitado"}</b></p><div class="bar"><i data-w="${Number(pct) || 0}"></i></div></div>`;
+      })
+      .join("");
     requestAnimationFrame(() => $$("#limits .bar i").forEach((i) => (i.style.width = i.dataset.w + "%")));
   };
-  const loadPlan = async () => {
+  const loadPlan = async (fallbackPlan) => {
     try {
-      const resp = await request("/user/plan-status");
-      session.update({ plan: resp.plan });
+      const resp = await request("/me/plan");
       renderPlan(resp.plan, resp.limits);
     } catch (err) {
       if (handleAuthError(err)) return;
-      renderPlan(session.user?.plan || "free", null);
+      renderPlan(fallbackPlan || "free", null);
     }
   };
 
@@ -298,42 +283,33 @@ import { $, $$, esc, safeUrl } from "../utils/dom.js";
     };
     requestAnimationFrame(step);
   };
-  const loadStats = async (userId) => {
-    if (!userId) return;
+  const loadStats = async () => {
     try {
-      const s = await request(`/user/${encodeURIComponent(userId)}/stats`);
-      const data = s?.data || s || {};
-      ["posts", "followers", "following"].forEach((k) => countTo($(`[data-stat="${k}"]`), Number(data[k]) || 0));
+      const data = await request("/me/stats");
+      ["posts", "followers", "following"].forEach((k) => countTo($(`[data-stat="${k}"]`), Number(data?.[k]) || 0));
     } catch (err) {
       handleAuthError(err);
     }
   };
 
   /* ---------- Sessão + carregamento ---------- */
+  // Dados pessoais só em memória: nada fica salvo no navegador
   const init = async () => {
-    renderUser(session.user);
-    let user = session.user;
+    let user = null;
     try {
-      const resp = await request("/user/session-status");
-      if (resp?.user) {
-        user = session.update({
-          ...resp.user,
-          name: resp.user.nome || resp.user.name || user?.name,
-          supabaseUserId: resp.user.supabase_uid || user?.supabaseUserId,
-          plan: resp.user.plan || user?.plan || "free",
-          role: (resp.user.role || user?.role || "").trim().toLowerCase(),
-        });
-        renderUser(user);
-      }
+      const resp = await getSession();
+      if (!resp?.authenticated) return location.replace(ROUTES.auth);
+      user = resp.user;
+      renderUser(user);
     } catch (err) {
       if (handleAuthError(err)) return;
-      // offline: segue com o usuário salvo
+      renderUser(null); // backend fora do ar: mostra o painel com dados genéricos
     }
     loadDaily();
     loadPopular("");
     loadAppointments();
-    loadPlan();
-    loadStats(user?.id);
+    loadPlan(user?.plan);
+    loadStats();
   };
   init();
 

@@ -1,29 +1,21 @@
-/* MOVT web — sessão local (mesmas chaves usadas por public/js/auth-guard.js) */
-const KEY_SESSION = "movt:sessionId";
-const KEY_USER = "movt:user";
-
-const store = {
-  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
-  set(k, v) { try { localStorage.setItem(k, v); } catch {} },
-  del(k) { try { localStorage.removeItem(k); } catch {} },
+/* MOVT web — estado de sessão no navegador
+ *
+ * O token de sessão fica num cookie HttpOnly definido pelo BFF: o JavaScript
+ * NÃO tem acesso a ele (nem um script injetado). Aqui só lemos:
+ * - movt_auth: dica "há sessão" (valor 1), usada para redirecionar sem chamar a API;
+ * - movt_csrf: token anti-CSRF enviado no header das requisições que alteram dados.
+ */
+const readCookie = (name) => {
+  const hit = document.cookie.split("; ").find((c) => c.startsWith(`${name}=`));
+  return hit ? decodeURIComponent(hit.slice(name.length + 1)) : null;
 };
 
-// Remove o override de API das versões antigas do site, se ainda existir
-store.del("movt:api");
+// Remove o que as versões antigas do site guardavam (token e dados pessoais)
+try {
+  ["movt:sessionId", "movt:user", "movt:api"].forEach((k) => localStorage.removeItem(k));
+} catch {}
 
 export const session = {
-  get user() {
-    try { return JSON.parse(store.get(KEY_USER) || "null"); } catch { return null; }
-  },
-  get id() { return store.get(KEY_SESSION); },
-  save(sessionId, user) {
-    store.set(KEY_SESSION, sessionId);
-    store.set(KEY_USER, JSON.stringify(user));
-  },
-  update(patch) {
-    const u = { ...(session.user || {}), ...patch };
-    store.set(KEY_USER, JSON.stringify(u));
-    return u;
-  },
-  clear() { store.del(KEY_SESSION); store.del(KEY_USER); },
+  get hinted() { return readCookie("movt_auth") === "1"; },
+  get csrf() { return readCookie("__Host-movt_csrf") || readCookie("movt_csrf"); },
 };

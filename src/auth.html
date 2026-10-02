@@ -103,9 +103,13 @@
         <label class="field">
           <span>Senha</span>
           <div class="pw">
-            <input type="password" name="senha" autocomplete="new-password" placeholder="Mínimo 6 caracteres" required minlength="6" />
+            <input type="password" name="senha" autocomplete="new-password" placeholder="Mínimo 8 caracteres" required minlength="8" />
             <button type="button" class="pw-toggle" aria-label="Mostrar senha"></button>
           </div>
+        </label>
+        <label class="consent">
+          <input type="checkbox" name="acceptTerms" value="1" required />
+          <span>Li e aceito os <a href="/termos" target="_blank" rel="noopener">Termos de Uso</a> e a <a href="/privacidade" target="_blank" rel="noopener">Política de Privacidade</a>.</span>
         </label>
         <p class="form-msg" role="alert"></p>
         <button class="btn btn-block" type="submit"><span>Criar conta</span></button>
@@ -127,7 +131,7 @@
         <label class="field" data-step="3" hidden>
           <span>Nova senha</span>
           <div class="pw">
-            <input type="password" name="newPassword" autocomplete="new-password" placeholder="Mínimo 6 caracteres" minlength="6" />
+            <input type="password" name="newPassword" autocomplete="new-password" placeholder="Mínimo 8 caracteres" minlength="8" />
             <button type="button" class="pw-toggle" aria-label="Mostrar senha"></button>
           </div>
         </label>
@@ -156,7 +160,7 @@
     </div>
     <div class="footer-bottom">
       <span>© 2026 – MOVT APP LTDA.</span>
-      <div><a href="#">Políticas de privacidade</a><a href="#">Termos &amp; Condições</a></div>
+      <div><a href="/privacidade">Políticas de privacidade</a><a href="/termos">Termos &amp; Condições</a></div>
     </div>
   </footer>
 
