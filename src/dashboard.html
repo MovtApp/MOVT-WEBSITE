@@ -104,6 +104,19 @@
     </div>
   </dialog>
 
+  <!-- Baixar app: App Store e Google Play com QR code (js/pages/dashboard/app-modal.js) -->
+  <dialog class="app-modal" id="app-modal" aria-labelledby="app-modal-title">
+    <button class="app-modal-x" data-close aria-label="Fechar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div class="app-modal-head">
+      <img src="/img/brand/favicon.png" alt="" width="44" height="44" />
+      <div>
+        <h2 id="app-modal-title">Baixe o app MOVT</h2>
+        <p>Treinos, agenda, comunidade e seu smartwatch no celular. <span class="only-desk">Escaneie o QR code com a câmera do celular ou clique no botão da sua loja.</span><span class="only-mobile">Toque na sua loja para instalar.</span></p>
+      </div>
+    </div>
+    <div class="app-stores" id="app-stores"></div>
+  </dialog>
+
   <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
 
   <script type="module" src="/js/pages/dashboard/index.js"></script>

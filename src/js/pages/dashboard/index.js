@@ -7,6 +7,7 @@ import { getSession, logout } from "../../core/auth.js";
 import { ROUTES } from "../../core/config.js";
 import { session } from "../../core/session.js";
 import { $, $$, esc, safeUrl } from "../../utils/dom.js";
+import { initAppModal } from "./app-modal.js";
 import { startRouter } from "./router.js";
 import { state } from "./state.js";
 import { capFirst, initSheet, planLabel } from "./ui.js";
@@ -143,6 +144,7 @@ import treinos from "./views/treinos.js";
 
   $$("[data-logout]").forEach((b) => b.addEventListener("click", logout));
   initSheet();
+  initAppModal();
 
   /* ---------- Sessão → telas ---------- */
   // Dados pessoais só em memória: nada fica salvo no navegador

@@ -72,6 +72,8 @@ Cada item do sidebar é uma tela própria. Todas as URLs servem o mesmo `dashboa
 | `/dashboard/plano` | Assinatura, uso dos limites e planos; assinar e portal da Stripe |
 | `/dashboard/comunidade` | Perfil, feed (curtir), meus posts e comunidades (`?aba=posts`) |
 
+**Baixar app:** todo link do painel para `/#download` abre um modal com App Store e Google Play, cada um com QR code gerado no navegador. Os links ficam em `STORES` (`src/js/core/config.js`); loja com link vazio aparece como "Em breve".
+
 Tela nova: crie `views/<nome>.js` exportando `{ title, eyebrow, render(el, ctx) }`, registre em `pages/dashboard/index.js` e adicione o link no sidebar do `dashboard.html`. Use `ctx.signal` em todo `addEventListener` para os ouvintes morrerem ao sair da tela.
 
 ## Rotas do BFF
