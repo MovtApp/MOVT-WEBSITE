@@ -179,6 +179,11 @@ async function planStatus(ctx) {
   return send(ctx.res, 200, clean.planStatus(data));
 }
 
+async function health(ctx) {
+  const { data } = await authed(ctx, { path: "/health/daily-summary" });
+  return send(ctx.res, 200, clean.health(data));
+}
+
 async function stats(ctx) {
   const s = readSession(ctx.req, ctx.cfg);
   // O ID vem da sessão cifrada, nunca do cliente (evita IDOR)
@@ -200,4 +205,5 @@ export const ROUTES = {
   "GET /api/me/appointments": { handler: appointments },
   "GET /api/me/plan": { handler: planStatus },
   "GET /api/me/stats": { handler: stats },
+  "GET /api/me/health": { handler: health },
 };

@@ -52,12 +52,20 @@ const limit = (l) => (l && typeof l === "object" ? { used: num(l.used), limit: l
 
 export const planStatus = (p = {}) => ({
   plan: plan(p.plan),
+  expiresAt: isoDate(p.plan_expires_at),
   limits: {
+    treinos: limit(p.limits?.treinos),
     agendamentos: limit(p.limits?.agendamentos),
     comunidades: limit(p.limits?.comunidades),
     dietas: limit(p.limits?.dietas),
+    desafios: limit(p.limits?.desafios),
   },
 });
+
+export const health = (h = {}) => {
+  const d = h.data || h;
+  return { steps: num(d.steps), calories: num(d.calories), sleepHours: num(d.sleep_hours), water: num(d.water_intake) };
+};
 
 export const stats = (s = {}) => {
   const d = s.data || s;

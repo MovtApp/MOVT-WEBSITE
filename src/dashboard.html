@@ -13,22 +13,24 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500&family=Wix+Madefor+Display:wght@600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/styles/global.css" />
   <link rel="stylesheet" href="/styles/dashboard.css" />
+  <link rel="stylesheet" href="/styles/dashboard-views.css" />
   <!-- Sem sessão → login, antes de renderizar (script externo por causa da CSP) -->
   <script src="/scripts/auth-guard.js"></script>
 </head>
 <body class="dash">
+  <a class="skip" href="#view">Pular para o conteúdo</a>
 
   <!-- ================= SIDEBAR ================= -->
   <aside class="side" id="side">
     <a href="/" class="side-logo" aria-label="MOVT — site">
       <img src="/img/brand/logo.png" alt="MOVT" width="120" height="34" />
     </a>
-    <nav class="side-nav">
-      <a href="#inicio" class="active"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Início</a>
-      <a href="#treinos"><svg viewBox="0 0 24 24"><path d="M6.5 6.5v11M17.5 6.5v11M3 9.5v5M21 9.5v5M6.5 12h11"/></svg>Treinos</a>
-      <a href="#agenda"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>Agenda</a>
-      <a href="#plano"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.9 7.1.6-5.4 4.7 1.6 7L12 17.5 5.8 21.2l1.6-7L2 9.5l7.1-.6z"/></svg>Meu plano</a>
-      <a href="#comunidade"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14.2A6.5 6.5 0 0 1 21.5 20"/></svg>Comunidade</a>
+    <nav class="side-nav" aria-label="Seções do painel">
+      <a href="/dashboard" data-link data-nav="inicio"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Início</a>
+      <a href="/dashboard/treinos" data-link data-nav="treinos"><svg viewBox="0 0 24 24"><path d="M6.5 6.5v11M17.5 6.5v11M3 9.5v5M21 9.5v5M6.5 12h11"/></svg>Treinos</a>
+      <a href="/dashboard/agenda" data-link data-nav="agenda"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>Agenda</a>
+      <a href="/dashboard/plano" data-link data-nav="plano"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.9 7.1.6-5.4 4.7 1.6 7L12 17.5 5.8 21.2l1.6-7L2 9.5l7.1-.6z"/></svg>Meu plano</a>
+      <a href="/dashboard/comunidade" data-link data-nav="comunidade"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14.2A6.5 6.5 0 0 1 21.5 20"/></svg>Comunidade</a>
     </nav>
     <div class="side-app">
       <p>Use o MOVT completo no celular</p>
@@ -43,15 +45,16 @@
     <header class="top">
       <button class="top-burger" aria-label="Abrir menu" aria-controls="side" aria-expanded="false"><span></span><span></span><span></span></button>
       <div class="top-hello">
-        <p class="top-date" id="today-label"></p>
-        <h1>Olá, <span class="grad" id="user-first">atleta</span> 👋</h1>
+        <p class="top-date" id="top-eyebrow"></p>
+        <h1 id="top-title" tabindex="-1">Olá, <span class="grad" id="user-first">atleta</span> 👋</h1>
       </div>
       <div class="top-user">
         <span class="plan-badge" id="plan-badge" hidden></span>
-        <button class="avatar" id="avatar-btn" aria-haspopup="menu" aria-expanded="false"><span id="avatar-initials">M</span></button>
+        <button class="avatar" id="avatar-btn" aria-label="Menu da conta" aria-haspopup="menu" aria-expanded="false"><span id="avatar-initials">M</span></button>
         <div class="user-menu" id="user-menu" role="menu" hidden>
           <p class="um-name" id="um-name"></p>
           <p class="um-email" id="um-email"></p>
+          <a href="/dashboard/plano" data-link role="menuitem">Meu plano</a>
           <a href="/" role="menuitem">Voltar ao site</a>
           <button role="menuitem" data-logout>Sair da conta</button>
         </div>
@@ -62,125 +65,37 @@
       <span>Sua conta ainda não foi verificada. Conclua a verificação pelo app para liberar todos os recursos.</span>
     </div>
 
-    <!-- ===== Início ===== -->
-    <section id="inicio" class="grid">
-      <article class="panel span-8 rise">
-        <div class="panel-head">
-          <h2 id="month-label">Semana</h2>
-          <div class="week-nav">
-            <button aria-label="Semana anterior" data-week="-1"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
-            <button aria-label="Próxima semana" data-week="1"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
-          </div>
-        </div>
-        <div class="week" id="week"></div>
-
-        <h3 class="sub-head">Resumo diário</h3>
-        <div class="metrics">
-          <div class="metric m-orange">
-            <i><svg viewBox="0 0 24 24"><path d="M12 2c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2.5 1.2-4 2.5-5 0 2 1 3 2 3 0-3-1-6 .5-9z"/></svg></i>
-            <p>Calorias</p><b data-metric="calories">—</b><small>kcal</small>
-          </div>
-          <div class="metric m-purple">
-            <i><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg></i>
-            <p>Tempo ativo</p><b data-metric="minutes">—</b><small>min</small>
-          </div>
-          <div class="metric m-blue">
-            <i><svg viewBox="0 0 24 24"><path d="M7 20c-2 0-3-1.5-3-3.5S5.5 12 7 12s2 1.5 2 3.5S9 20 7 20zM17 13c-2 0-3-1.5-3-3.5S15.5 5 17 5s2 1.5 2 3.5S19 13 17 13z"/></svg></i>
-            <p>Passos</p><b data-metric="steps">—</b><small>hoje</small>
-          </div>
-          <div class="metric m-red">
-            <i><svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></i>
-            <p>Batimentos</p><b data-metric="bpm">—</b><small>bpm</small>
-          </div>
-        </div>
-        <p class="hint">Métricas de saúde vêm do seu smartwatch (Apple Health / Google Fit) e são sincronizadas pelo app MOVT.</p>
-      </article>
-
-      <article class="panel span-4 rise" style="--d:.08s">
-        <div class="panel-head">
-          <h2>Performance</h2>
-          <span class="tag">Exemplo</span>
-        </div>
-        <div class="radar-wrap"><svg class="radar" id="radar" viewBox="0 0 240 240" role="img" aria-label="Gráfico de performance"></svg></div>
-        <p class="hint">O radar é preenchido com os dados do seu smartwatch quando você sincroniza pelo app.</p>
-      </article>
-    </section>
-
-    <!-- ===== Treinos ===== -->
-    <section id="treinos" class="block rise">
-      <div class="block-head">
-        <h2 class="section-h"><span>Treinos do dia</span></h2>
-      </div>
-      <div class="daily" id="daily"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
-    </section>
-
-    <section class="block rise">
-      <div class="block-head">
-        <h2 class="section-h"><span>Exercícios populares</span></h2>
-        <div class="chips" id="chips">
-          <button class="chip active" data-spec="">Todos</button>
-          <button class="chip" data-spec="musculacao">Musculação</button>
-          <button class="chip" data-spec="funcional">Funcional</button>
-          <button class="chip" data-spec="cardio">Cardio</button>
-          <button class="chip" data-spec="yoga">Yoga</button>
-        </div>
-      </div>
-      <div class="hscroll" id="popular"></div>
-    </section>
-
-    <!-- ===== Agenda + Plano + Comunidade ===== -->
-    <section class="grid">
-      <article id="agenda" class="panel span-6 rise">
-        <div class="panel-head"><h2>Próximos agendamentos</h2></div>
-        <ul class="appts" id="appts"><li class="skeleton line"></li><li class="skeleton line"></li></ul>
-      </article>
-
-      <article id="plano" class="panel span-3 rise" style="--d:.06s">
-        <div class="panel-head"><h2>Meu plano</h2></div>
-        <div class="plan" id="plan">
-          <p class="plan-name grad" id="plan-name">—</p>
-          <div class="limits" id="limits"></div>
-          <a href="/#download" class="btn btn-sm plan-cta" id="plan-cta" hidden>Seja Premium</a>
-        </div>
-      </article>
-
-      <article id="comunidade" class="panel span-3 rise" style="--d:.12s">
-        <div class="panel-head"><h2>Comunidade</h2></div>
-        <div class="social">
-          <div><b data-stat="posts">—</b><span>Posts</span></div>
-          <div><b data-stat="followers">—</b><span>Seguidores</span></div>
-          <div><b data-stat="following">—</b><span>Seguindo</span></div>
-        </div>
-        <div class="hive mini" aria-hidden="true">
-          <div class="hive-row">
-            <img src="/img/avatars/avatar-01.jpg" alt="" />
-            <img src="/img/avatars/avatar-02.jpg" alt="" />
-            <span class="hive-you">Você</span>
-            <img src="/img/avatars/avatar-03.jpg" alt="" />
-            <img src="/img/avatars/avatar-04.jpg" alt="" />
-          </div>
-        </div>
-      </article>
-    </section>
+    <!-- Cada tela do painel é desenhada aqui pelo roteador (js/pages/dashboard/router.js) -->
+    <main id="view" class="view" tabindex="-1" aria-live="polite"></main>
 
     <footer class="dash-foot">© 2026 – MOVT APP LTDA.</footer>
   </div>
 
-  <!-- Detalhe de treino -->
-  <dialog class="sheet" id="sheet">
+  <!-- Detalhe (treino, post, comunidade) -->
+  <dialog class="sheet" id="sheet" aria-labelledby="sheet-title">
     <div class="sheet-img"><img id="sheet-img" alt="" /></div>
     <div class="sheet-body">
       <p class="eyebrow" id="sheet-cat"></p>
       <h3 id="sheet-title"></h3>
       <div class="sheet-meta" id="sheet-meta"></div>
       <p class="sheet-desc" id="sheet-desc"></p>
-      <div class="sheet-actions">
-        <a href="/#download" class="btn">Começar no app</a>
-        <button class="btn btn-ghost" data-close>Fechar</button>
-      </div>
+      <div class="sheet-extra" id="sheet-extra"></div>
+      <div class="sheet-actions" id="sheet-actions"></div>
     </div>
   </dialog>
 
-  <script type="module" src="/js/pages/dashboard.js"></script>
+  <!-- Confirmação de ações -->
+  <dialog class="confirm" id="confirm" aria-labelledby="confirm-title">
+    <h3 id="confirm-title"></h3>
+    <p id="confirm-text"></p>
+    <div class="confirm-actions">
+      <button class="btn btn-ghost" value="cancel" data-confirm="no">Voltar</button>
+      <button class="btn" value="ok" data-confirm="yes" id="confirm-ok">Confirmar</button>
+    </div>
+  </dialog>
+
+  <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+  <script type="module" src="/js/pages/dashboard/index.js"></script>
 </body>
 </html>

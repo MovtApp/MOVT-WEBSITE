@@ -29,6 +29,19 @@ function bff() {
   return { name: "movt-bff", configureServer: mount, configurePreviewServer: mount };
 }
 
+// Telas do painel (/dashboard/treinos, /dashboard/agenda...) servem o mesmo
+// dashboard.html, igual ao rewrite do vercel.json. O roteador do cliente escolhe a tela.
+function dashboardRoutes() {
+  const mount = (server) => {
+    server.middlewares.use((req, _res, next) => {
+      const [path, query = ""] = String(req.url || "").split("?");
+      if (/^\/dashboard(\/[a-z-]+)*\/?$/.test(path)) req.url = `/dashboard.html${query ? `?${query}` : ""}`;
+      next();
+    });
+  };
+  return { name: "movt-dashboard-routes", configureServer: mount, configurePreviewServer: mount };
+}
+
 export default defineConfig(({ mode }) => {
   // Variáveis do servidor (sem prefixo VITE_) só para o BFF local; nunca vão para o bundle
   for (const [k, v] of Object.entries(loadEnv(mode, dir, ""))) process.env[k] ??= v;
@@ -37,7 +50,7 @@ export default defineConfig(({ mode }) => {
     root,
     envDir: dir,
     publicDir: resolve(dir, "public"),
-    plugins: [bff()],
+    plugins: [bff(), dashboardRoutes()],
     build: {
       outDir: resolve(dir, "dist"),
       emptyOutDir: true,
