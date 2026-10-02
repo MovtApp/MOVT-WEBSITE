@@ -1,12 +1,12 @@
 /* MOVT web — dashboard */
-(() => {
-  const { session, request } = window.MOVT;
-  if (!session.id) return; // o <head> já redirecionou
+import { request } from "../core/api.js";
+import { logout } from "../core/auth.js";
+import { ROUTES } from "../core/config.js";
+import { session } from "../core/session.js";
+import { $, $$, esc, safeUrl } from "../utils/dom.js";
 
-  const $ = (s, r = document) => r.querySelector(s);
-  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
-  const esc = (v) =>
-    String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+(() => {
+  if (!session.id) return; // public/js/auth-guard.js já redirecionou
 
   // Fallback idêntico ao da Home do app quando /treinos não retorna nada
   const EXERCISE_FALLBACK = [
@@ -23,7 +23,7 @@
   const handleAuthError = (err) => {
     if (err && (err.status === 401 || err.status === 403)) {
       session.clear();
-      location.replace("auth.html");
+      location.replace(ROUTES.auth);
       return true;
     }
     return false;
@@ -38,7 +38,7 @@
     const initials = name ? name.split(/\s+/).slice(0, 2).map((p) => p[0]).join("").toUpperCase() : "M";
     const av = $("#avatar-btn");
     if (u?.photo) {
-      av.innerHTML = `<img src="${esc(u.photo)}" alt="" />`;
+      av.innerHTML = `<img src="${esc(safeUrl(u.photo))}" alt="" referrerpolicy="no-referrer" />`;
       av.querySelector("img").onerror = () => (av.innerHTML = `<span>${esc(initials)}</span>`);
     } else {
       av.innerHTML = `<span>${esc(initials)}</span>`;
@@ -134,7 +134,7 @@
     minutes: t.minutes || t.duracao || "",
     sets: t.sets || "3 séries",
     category: t.category || t.categoria || "Fitness",
-    imageUrl: t.image_url || t.imageUrl || t.imageurl || "",
+    imageUrl: safeUrl(t.image_url || t.imageUrl || t.imageurl || ""),
   });
 
   const openSheet = (t, kind) => {
@@ -269,7 +269,7 @@
       rows
         .map(([label, { used = 0, limit }]) => {
           const pct = limit ? Math.min(100, (used / limit) * 100) : 100;
-          return `<div class="limit"><p>${label}<b>${used}${limit ? ` / ${limit}` : " · ilimitado"}</b></p><div class="bar"><i data-w="${pct}"></i></div></div>`;
+          return `<div class="limit"><p>${label}<b>${esc(used)}${limit ? ` / ${esc(limit)}` : " · ilimitado"}</b></p><div class="bar"><i data-w="${Number(pct) || 0}"></i></div></div>`;
         })
         .join("") +
       (limits?.dietas
@@ -365,7 +365,7 @@
   $$(".side-nav a").forEach((a) => a.addEventListener("click", () => setSide(false)));
   addEventListener("keydown", (e) => e.key === "Escape" && setSide(false));
 
-  $$("[data-logout]").forEach((b) => b.addEventListener("click", () => window.MOVT.logout()));
+  $$("[data-logout]").forEach((b) => b.addEventListener("click", logout));
 
   const navLinks = $$(".side-nav a");
   const targets = navLinks.map((a) => document.getElementById(a.hash.slice(1)));

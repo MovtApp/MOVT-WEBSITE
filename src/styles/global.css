@@ -270,7 +270,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   content: "";
   position: absolute;
   inset: 0;
-  background: url("https://framerusercontent.com/images/YlYIbfFEujexwgWABDzpsRlY.webp?width=722&height=1470") center / 100% 100% no-repeat;
+  background: url("/img/brand/phone-frame.webp") center / 100% 100% no-repeat;
   pointer-events: none;
 }
 

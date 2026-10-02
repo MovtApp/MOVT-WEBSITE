@@ -5,25 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dashboard — MOVT APP</title>
   <meta name="theme-color" content="#121212" />
-  <meta name="robots" content="noindex" />
-  <link rel="icon" href="https://framerusercontent.com/images/ERUr9CCEk7wqsGf1HvzI6cbCZI.png" />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" href="/img/brand/logo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@500,700,900&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500&family=Wix+Madefor+Display:wght@600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="dashboard.css" />
-  <script>
-    // Sem sessão → login (antes de renderizar qualquer coisa)
-    try { if (!localStorage.getItem("movt:sessionId")) location.replace("auth.html"); } catch (e) { location.replace("auth.html"); }
-  </script>
+  <link rel="stylesheet" href="/styles/global.css" />
+  <link rel="stylesheet" href="/styles/dashboard.css" />
+  <!-- Sem sessão → login, antes de renderizar (script externo por causa da CSP) -->
+  <script src="/scripts/auth-guard.js"></script>
 </head>
 <body class="dash">
 
   <!-- ================= SIDEBAR ================= -->
   <aside class="side" id="side">
-    <a href="index.html" class="side-logo" aria-label="MOVT — site">
-      <img src="https://framerusercontent.com/images/ERUr9CCEk7wqsGf1HvzI6cbCZI.png?width=641&height=182" alt="MOVT" width="120" height="34" />
+    <a href="/" class="side-logo" aria-label="MOVT — site">
+      <img src="/img/brand/logo.png" alt="MOVT" width="120" height="34" />
     </a>
     <nav class="side-nav">
       <a href="#inicio" class="active"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Início</a>
@@ -34,7 +32,7 @@
     </nav>
     <div class="side-app">
       <p>Use o MOVT completo no celular</p>
-      <a href="index.html#download" class="btn btn-sm">Baixar app</a>
+      <a href="/#download" class="btn btn-sm">Baixar app</a>
     </div>
     <button class="side-logout" data-logout><svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l-5-5 5-5M5 12h12"/></svg>Sair</button>
   </aside>
@@ -54,7 +52,7 @@
         <div class="user-menu" id="user-menu" role="menu" hidden>
           <p class="um-name" id="um-name"></p>
           <p class="um-email" id="um-email"></p>
-          <a href="index.html" role="menuitem">Voltar ao site</a>
+          <a href="/" role="menuitem">Voltar ao site</a>
           <button role="menuitem" data-logout>Sair da conta</button>
         </div>
       </div>
@@ -142,7 +140,7 @@
         <div class="plan" id="plan">
           <p class="plan-name grad" id="plan-name">—</p>
           <div class="limits" id="limits"></div>
-          <a href="index.html#download" class="btn btn-sm plan-cta" id="plan-cta" hidden>Seja Premium</a>
+          <a href="/#download" class="btn btn-sm plan-cta" id="plan-cta" hidden>Seja Premium</a>
         </div>
       </article>
 
@@ -155,11 +153,11 @@
         </div>
         <div class="hive mini" aria-hidden="true">
           <div class="hive-row">
-            <img src="https://framerusercontent.com/images/adA3ca5MJSdYVtT9ZmtqJigs.jpg?scale-down-to=128" alt="" />
-            <img src="https://framerusercontent.com/images/tujZwsPf8AUims1BtwCfTT4SA.jpg?scale-down-to=128" alt="" />
+            <img src="/img/avatars/avatar-01.jpg" alt="" />
+            <img src="/img/avatars/avatar-02.jpg" alt="" />
             <span class="hive-you">Você</span>
-            <img src="https://framerusercontent.com/images/9ZVeP4MJcRhKqtYw7q6Joy2Ank.jpg?scale-down-to=128" alt="" />
-            <img src="https://framerusercontent.com/images/lAQ3DnVyzZFz3oUJL2Sq69e9RvM.jpg?scale-down-to=128" alt="" />
+            <img src="/img/avatars/avatar-03.jpg" alt="" />
+            <img src="/img/avatars/avatar-04.jpg" alt="" />
           </div>
         </div>
       </article>
@@ -177,13 +175,12 @@
       <div class="sheet-meta" id="sheet-meta"></div>
       <p class="sheet-desc" id="sheet-desc"></p>
       <div class="sheet-actions">
-        <a href="index.html#download" class="btn">Começar no app</a>
+        <a href="/#download" class="btn">Começar no app</a>
         <button class="btn btn-ghost" data-close>Fechar</button>
       </div>
     </div>
   </dialog>
 
-  <script src="app.js"></script>
-  <script src="dashboard.js"></script>
+  <script type="module" src="/js/pages/dashboard.js"></script>
 </body>
 </html>

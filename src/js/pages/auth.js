@@ -1,10 +1,14 @@
 /* MOVT web — login, registro e recuperação de senha */
-(() => {
-  const { session } = window.MOVT;
+import { login, recovery, register } from "../core/auth.js";
+import { ROUTES } from "../core/config.js";
+import { session } from "../core/session.js";
+import { initMobileMenu } from "../components/mobile-menu.js";
+import { digits, isEmail, maskCNPJ, maskCPF, maskPhone } from "../utils/masks.js";
 
+(() => {
   // Já logado → vai direto ao dashboard
   if (session.id) {
-    location.replace("dashboard.html");
+    location.replace(ROUTES.dashboard);
     return;
   }
 
@@ -65,23 +69,8 @@
   const markInvalid = (form, names) => {
     form.querySelectorAll("input").forEach((i) => i.classList.toggle("invalid", names.includes(i.name)));
   };
-  const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 
-  /* ---------- Máscaras (mesmo formato do app) ---------- */
-  const digits = (v) => v.replace(/\D/g, "");
-  const maskCPF = (v) =>
-    digits(v).slice(0, 11).replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-  const maskCNPJ = (v) =>
-    digits(v).slice(0, 14).replace(/^(\d{2})(\d)/, "$1.$2").replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
-      .replace(/\.(\d{3})(\d)/, ".$1/$2").replace(/(\d{4})(\d)/, "$1-$2");
-  const maskPhone = (v) => {
-    const d = digits(v).slice(0, 11);
-    if (d.length <= 2) return d.length ? `(${d}` : "";
-    if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
-    if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
-    return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
-  };
-
+  /* ---------- Documento e telefone ---------- */
   const reg = panels.register;
   const docInput = reg.elements.cpf_cnpj;
   const docType = () => reg.querySelector('input[name="tipo_documento"]:checked').value;
@@ -112,9 +101,9 @@
     msg(f, "");
     busy(f, true);
     try {
-      await window.MOVT.login(email, senha);
+      await login(email, senha);
       msg(f, "Login efetuado! Redirecionando…", true);
-      location.href = "dashboard.html";
+      location.href = ROUTES.dashboard;
     } catch (err) {
       msg(f, err.status === 401 || err.status === 400 ? err.message || "E-mail ou senha inválidos." : err.message);
       busy(f, false);
@@ -139,7 +128,7 @@
     msg(reg, "");
     busy(reg, true);
     try {
-      const data = await window.MOVT.register({
+      const data = await register({
         nome: v.nome.trim(),
         email: v.email.trim(),
         senha: v.senha,
@@ -192,13 +181,13 @@
     busy(rec, true);
     try {
       if (step === 1) {
-        await window.MOVT.recovery.request(email);
+        await recovery.request(email);
         setStep(2);
       } else if (step === 2) {
-        await window.MOVT.recovery.verify(email, code);
+        await recovery.verify(email, code);
         setStep(3);
       } else {
-        await window.MOVT.recovery.reset(email, code, newPassword);
+        await recovery.reset(email, code, newPassword);
         rec.reset();
         setStep(1);
         show("login");
@@ -212,12 +201,5 @@
     }
   });
 
-  /* ---------- Menu mobile ---------- */
-  const burger = document.querySelector(".nav-burger");
-  const menu = document.querySelector(".nav-mobile");
-  burger.addEventListener("click", () => {
-    const open = menu.hidden;
-    menu.hidden = !open;
-    burger.setAttribute("aria-expanded", open);
-  });
+  initMobileMenu();
 })();

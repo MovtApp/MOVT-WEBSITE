@@ -6,14 +6,23 @@
   <title>MOVT APP</title>
   <meta name="description" content="MOVT — A revolução do seu bem-estar. Personal trainers, academias parceiras e acompanhamento inteligente de métricas." />
   <meta name="theme-color" content="#121212" />
-  <link rel="icon" href="https://framerusercontent.com/images/ERUr9CCEk7wqsGf1HvzI6cbCZI.png" />
+  <link rel="canonical" href="%VITE_SITE_URL%/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="pt_BR" />
+  <meta property="og:site_name" content="MOVT" />
+  <meta property="og:title" content="MOVT — A revolução do seu bem-estar" />
+  <meta property="og:description" content="Personal trainers, academias parceiras e acompanhamento inteligente de métricas." />
+  <meta property="og:url" content="%VITE_SITE_URL%/" />
+  <meta property="og:image" content="%VITE_SITE_URL%/img/screens/app-home.png" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="icon" href="/img/brand/logo.png" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@500,700,900&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500&family=Wix+Madefor+Display:wght@600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="/styles/global.css" />
 </head>
 <body>
 
@@ -21,7 +30,7 @@
   <header class="nav-wrap">
     <nav class="nav" aria-label="Principal">
       <a href="#home" class="nav-logo" aria-label="MOVT — início">
-        <img src="https://framerusercontent.com/images/ERUr9CCEk7wqsGf1HvzI6cbCZI.png?width=641&height=182" alt="MOVT" width="108" height="29" />
+        <img src="/img/brand/logo.png" alt="MOVT" width="108" height="29" />
       </a>
       <div class="nav-links">
         <span class="nav-pill" aria-hidden="true"></span>
@@ -31,7 +40,7 @@
         <a href="#blog" data-spy="blog">Blog</a>
         <a href="#download" data-spy="download">Download</a>
       </div>
-      <a href="auth.html" class="btn btn-sm nav-cta" data-auth-link>Entrar</a>
+      <a href="/auth" class="btn btn-sm nav-cta" data-auth-link>Entrar</a>
       <button class="nav-burger" aria-label="Abrir menu" aria-expanded="false">
         <span></span><span></span>
       </button>
@@ -42,7 +51,7 @@
       <a href="#faq">FAQ</a>
       <a href="#blog">Blog</a>
       <a href="#download">Download</a>
-      <a href="auth.html" class="btn" data-auth-link>Entrar</a>
+      <a href="/auth" class="btn" data-auth-link>Entrar</a>
     </div>
   </header>
 
@@ -50,18 +59,18 @@
     <!-- ================= HERO ================= -->
     <section id="home" class="hero">
       <div class="hero-top">
-        <img class="hero-logo appear" style="--d:0s" src="https://framerusercontent.com/images/ERUr9CCEk7wqsGf1HvzI6cbCZI.png?width=641&height=182" alt="MOVT" width="257" height="65" />
+        <img class="hero-logo appear" style="--d:0s" src="/img/brand/logo.png" alt="MOVT" width="257" height="65" />
         <h1 class="hero-title appear" style="--d:.12s"><span>A revolução do<br />seu bem-estar</span></h1>
         <a href="#download" class="btn appear" style="--d:.24s">Download</a>
       </div>
 
       <div class="hero-apps" aria-hidden="true">
         <div class="hero-apps-inner">
-          <div class="ticker" data-speed="60"  data-imgs="VR5YcH4SjYcY0gtXAeZNRG6e2w.jpeg,1HoI3DBdlQ7sXXUKVZLoqqpMjY.jpeg"></div>
-          <div class="ticker" data-speed="70"  data-imgs="1HoI3DBdlQ7sXXUKVZLoqqpMjY.jpeg,VR5YcH4SjYcY0gtXAeZNRG6e2w.jpeg"></div>
-          <div class="ticker" data-speed="80"  data-imgs="E1sgKQyfBPlpRtSeSUSZOse1m0.jpeg,GYU9e9TPWJjSs8PvokztGvWwbJo.jpeg"></div>
-          <div class="ticker" data-speed="70"  data-imgs="GYU9e9TPWJjSs8PvokztGvWwbJo.jpeg,E1sgKQyfBPlpRtSeSUSZOse1m0.jpeg"></div>
-          <div class="ticker" data-speed="60"  data-imgs="xmG58df8Wr6koQkWGjeADOF4KHE.jpeg,ZHrHk5VDEuEyYWE05PyqCKKfwE.jpeg"></div>
+          <div class="ticker" data-speed="60"  data-imgs="health-summary.jpg,home.jpg"></div>
+          <div class="ticker" data-speed="70"  data-imgs="home.jpg,health-summary.jpg"></div>
+          <div class="ticker" data-speed="80"  data-imgs="trainers-map.jpg,workout-detail.jpg"></div>
+          <div class="ticker" data-speed="70"  data-imgs="workout-detail.jpg,trainers-map.jpg"></div>
+          <div class="ticker" data-speed="60"  data-imgs="trainers-list.jpg,trainer-profile.jpg"></div>
         </div>
         <div class="hero-vignette"></div>
       </div>
@@ -76,9 +85,9 @@
           <h6 class="eyebrow">Personalização</h6>
           <h3 class="card-title">Encontre o personal trainer ideal para os seus objetivos</h3>
           <div class="phones-row">
-            <div class="phone sm"><img src="https://framerusercontent.com/images/E1sgKQyfBPlpRtSeSUSZOse1m0.jpeg?width=739&height=1600" alt="Mapa de personal trainers" loading="lazy" /></div>
-            <div class="phone sm"><img src="https://framerusercontent.com/images/xmG58df8Wr6koQkWGjeADOF4KHE.jpeg?width=739&height=1600" alt="Lista de profissionais" loading="lazy" /></div>
-            <div class="phone sm"><img src="https://framerusercontent.com/images/ZHrHk5VDEuEyYWE05PyqCKKfwE.jpeg?width=739&height=1600" alt="Perfil do profissional" loading="lazy" /></div>
+            <div class="phone sm"><img src="/img/screens/trainers-map.jpg" alt="Mapa de personal trainers" loading="lazy" /></div>
+            <div class="phone sm"><img src="/img/screens/trainers-list.jpg" alt="Lista de profissionais" loading="lazy" /></div>
+            <div class="phone sm"><img src="/img/screens/trainer-profile.jpg" alt="Perfil do profissional" loading="lazy" /></div>
           </div>
         </article>
 
@@ -102,20 +111,20 @@
           <h3 class="card-title">Acompanhamento inteligente de métricas e evolução</h3>
           <div class="hive">
             <div class="hive-row">
-              <img src="https://framerusercontent.com/images/adA3ca5MJSdYVtT9ZmtqJigs.jpg?scale-down-to=256" alt="" loading="lazy" />
-              <img src="https://framerusercontent.com/images/tujZwsPf8AUims1BtwCfTT4SA.jpg?scale-down-to=256" alt="" loading="lazy" />
-              <img src="https://framerusercontent.com/images/9ZVeP4MJcRhKqtYw7q6Joy2Ank.jpg?scale-down-to=256" alt="" loading="lazy" />
+              <img src="/img/avatars/avatar-01.jpg" alt="" loading="lazy" />
+              <img src="/img/avatars/avatar-02.jpg" alt="" loading="lazy" />
+              <img src="/img/avatars/avatar-03.jpg" alt="" loading="lazy" />
             </div>
             <div class="hive-row">
-              <img src="https://framerusercontent.com/images/lAQ3DnVyzZFz3oUJL2Sq69e9RvM.jpg?scale-down-to=256" alt="" loading="lazy" />
-              <img src="https://framerusercontent.com/images/M7Xh8DUZcRnsPSVjcv1lVqdCtU.jpg?scale-down-to=256" alt="" loading="lazy" />
+              <img src="/img/avatars/avatar-04.jpg" alt="" loading="lazy" />
+              <img src="/img/avatars/avatar-05.jpg" alt="" loading="lazy" />
               <span class="hive-you">Você</span>
-              <img src="https://framerusercontent.com/images/9Eojl9xKz48ZbfN2wukMx7GvI.jpg?scale-down-to=256" alt="" loading="lazy" />
+              <img src="/img/avatars/avatar-06.jpg" alt="" loading="lazy" />
             </div>
             <div class="hive-row">
-              <img src="https://framerusercontent.com/images/E70khUOPo4SPW1Ec67FW1kHGxJs.jpg?scale-down-to=256" alt="" loading="lazy" />
-              <img src="https://framerusercontent.com/images/B42wDkdQFYe04HN279TDOvSiPy4.jpg?scale-down-to=256" alt="" loading="lazy" />
-              <img src="https://framerusercontent.com/images/VPex5Il6dSmPtZzSiJRvlMwhLuc.jpg?scale-down-to=256" alt="" loading="lazy" />
+              <img src="/img/avatars/avatar-07.jpg" alt="" loading="lazy" />
+              <img src="/img/avatars/avatar-08.jpg" alt="" loading="lazy" />
+              <img src="/img/avatars/avatar-09.jpg" alt="" loading="lazy" />
             </div>
           </div>
         </article>
@@ -125,7 +134,7 @@
             <h6 class="eyebrow">Saúde integral</h6>
             <h3 class="card-title">Transforme sua rotina com foco em saúde e bem-estar</h3>
           </div>
-          <div class="phone lg"><img src="https://framerusercontent.com/images/VR5YcH4SjYcY0gtXAeZNRG6e2w.jpeg?width=739&height=1600" alt="Resumo diário de saúde" loading="lazy" /></div>
+          <div class="phone lg"><img src="/img/screens/health-summary.jpg" alt="Resumo diário de saúde" loading="lazy" /></div>
         </article>
       </div>
     </section>
@@ -145,11 +154,11 @@
         <div class="marquee-track">
           <figure class="quote">
             <blockquote>"O MOVT mudou completamente minha relação com os treinos. Encontrei um profissional excelente perto de mim e a tecnologia do app me mantém motivado todos os dias."</blockquote>
-            <figcaption><img src="https://framerusercontent.com/images/9Eojl9xKz48ZbfN2wukMx7GvI.jpg?scale-down-to=128" alt="" loading="lazy" /> James Bearman</figcaption>
+            <figcaption><img src="/img/avatars/avatar-06.jpg" alt="" loading="lazy" /> James Bearman</figcaption>
           </figure>
           <figure class="quote">
             <blockquote>"A facilidade de acessar academias parceiras e ter todo o meu progresso registrado em um só lugar traz um nível de profissionalismo que eu nunca tinha visto."</blockquote>
-            <figcaption><img src="https://framerusercontent.com/images/syZZLnWTNkL3xTyQlU0poWCyUo.jpg?scale-down-to=128" alt="" loading="lazy" /> Natasha Jackson</figcaption>
+            <figcaption><img src="/img/avatars/avatar-10.jpg" alt="" loading="lazy" /> Natasha Jackson</figcaption>
           </figure>
         </div>
       </div>
@@ -187,11 +196,11 @@
       <div class="carousel reveal">
         <div class="carousel-viewport">
           <div class="carousel-track">
-            <a class="post" href="#"><div class="post-img"><img src="https://framerusercontent.com/images/1XVtsksGarwFScfywtXIBiCxckk.jpg?width=1200&height=675" alt="" loading="lazy" /></div><time>8 de abr. de 2022</time><h4>A importância do acompanhamento profissional para hipertrofia</h4></a>
-            <a class="post" href="#"><div class="post-img"><img src="https://framerusercontent.com/images/XFhokzidQKhTiTPpeAIRQpsGD8.png?scale-down-to=1024" alt="" loading="lazy" /></div><time>15 de mar. de 2022</time><h4>Nutrição estratégica: O combustível para seus resultados extraordinários</h4></a>
-            <a class="post" href="#"><div class="post-img"><img src="https://framerusercontent.com/images/H5RdaWghHXN3wUEMvDJ2KIv0xc.png?scale-down-to=1024" alt="" loading="lazy" /></div><time>28 de fev. de 2022</time><h4>Tecnologia no fitness: Como o monitoramento otimiza seu desempenho</h4></a>
-            <a class="post" href="#"><div class="post-img"><img src="https://framerusercontent.com/images/sJEJdXJ75D7h2MTqPADaEdPuy04.png?scale-down-to=1024" alt="" loading="lazy" /></div><time>6 de fev. de 2022</time><h4>A arte da recuperação: Por que o descanso é onde o músculo cresce</h4></a>
-            <a class="post" href="#"><div class="post-img"><img src="https://framerusercontent.com/images/H4zbGHyhIcW8KfiSth8OZDdyZk.png?scale-down-to=1024" alt="" loading="lazy" /></div><time>12 de jan. de 2022</time><h4>A força da comunidade: Conecte-se aos melhores e alcance o topo</h4></a>
+            <a class="post" href="#"><div class="post-img"><img src="/img/blog/hipertrofia.jpg" alt="" loading="lazy" /></div><time>8 de abr. de 2022</time><h4>A importância do acompanhamento profissional para hipertrofia</h4></a>
+            <a class="post" href="#"><div class="post-img"><img src="/img/blog/nutricao.png" alt="" loading="lazy" /></div><time>15 de mar. de 2022</time><h4>Nutrição estratégica: O combustível para seus resultados extraordinários</h4></a>
+            <a class="post" href="#"><div class="post-img"><img src="/img/blog/tecnologia.png" alt="" loading="lazy" /></div><time>28 de fev. de 2022</time><h4>Tecnologia no fitness: Como o monitoramento otimiza seu desempenho</h4></a>
+            <a class="post" href="#"><div class="post-img"><img src="/img/blog/recuperacao.png" alt="" loading="lazy" /></div><time>6 de fev. de 2022</time><h4>A arte da recuperação: Por que o descanso é onde o músculo cresce</h4></a>
+            <a class="post" href="#"><div class="post-img"><img src="/img/blog/comunidade.png" alt="" loading="lazy" /></div><time>12 de jan. de 2022</time><h4>A força da comunidade: Conecte-se aos melhores e alcance o topo</h4></a>
           </div>
         </div>
         <button class="car-btn prev" aria-label="Anterior"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
@@ -218,7 +227,7 @@
           </div>
         </div>
         <div class="cta-phone">
-          <div class="phone xl"><img src="https://framerusercontent.com/images/aIG5QCeEu0Isa4WKJnTT5Rnk2Dw.png?width=342&height=739" alt="Tela inicial do app MOVT" loading="lazy" /></div>
+          <div class="phone xl"><img src="/img/screens/app-home.png" alt="Tela inicial do app MOVT" loading="lazy" /></div>
         </div>
       </div>
     </section>
@@ -228,7 +237,7 @@
   <footer class="footer container">
     <div class="footer-top">
       <div class="footer-brand reveal">
-        <img src="https://framerusercontent.com/images/ERUr9CCEk7wqsGf1HvzI6cbCZI.png?width=641&height=182" alt="MOVT" width="260" height="73" loading="lazy" />
+        <img src="/img/brand/logo.png" alt="MOVT" width="260" height="73" loading="lazy" />
         <p>Eleve seu padrão de treinamento com o MOVT.</p>
       </div>
       <div class="footer-cols reveal" style="--d:.1s">
@@ -248,7 +257,6 @@
     </div>
   </footer>
 
-  <script src="app.js"></script>
-  <script src="main.js"></script>
+  <script type="module" src="/js/pages/landing.js"></script>
 </body>
 </html>

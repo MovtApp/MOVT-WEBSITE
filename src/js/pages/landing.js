@@ -1,6 +1,10 @@
 /* MOVT landing — interações */
+import { ROUTES } from "../core/config.js";
+import { session } from "../core/session.js";
+import { initMobileMenu } from "../components/mobile-menu.js";
+
 (() => {
-  const IMG_BASE = "https://framerusercontent.com/images/";
+  const IMG_BASE = "/img/screens/";
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   /* ---------- Hero: colunas de mockups com scroll vertical infinito ---------- */
@@ -13,7 +17,11 @@
       for (const name of imgs) {
         const phone = document.createElement("div");
         phone.className = "phone";
-        phone.innerHTML = `<img src="${IMG_BASE}${name}?width=739&height=1600" alt="" loading="${i < 2 ? "eager" : "lazy"}" />`;
+        const img = document.createElement("img");
+        img.src = IMG_BASE + name;
+        img.alt = "";
+        img.loading = i < 2 ? "eager" : "lazy";
+        phone.appendChild(img);
         track.appendChild(phone);
       }
     }
@@ -191,15 +199,15 @@
     update();
   }
 
-  /* ---------- Menu mobile ---------- */
-  const burger = document.querySelector(".nav-burger");
-  const menu = document.querySelector(".nav-mobile");
-  const toggleMenu = (open) => {
-    burger.setAttribute("aria-expanded", open);
-    menu.hidden = !open;
-  };
-  burger.addEventListener("click", () => toggleMenu(menu.hidden));
-  menu.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => toggleMenu(false)));
+  initMobileMenu();
+
+  /* ---------- Botões "Entrar" viram "Dashboard" quando já há sessão ---------- */
+  if (session.id) {
+    document.querySelectorAll("[data-auth-link]").forEach((a) => {
+      a.textContent = "Dashboard";
+      a.href = ROUTES.dashboard;
+    });
+  }
 
   /* ---------- Init ---------- */
   const onScroll = () => { onScrollHero(); spy(); };
