@@ -16,6 +16,13 @@ svg { flex: 0 0 auto; }
   inset: 0 auto 0 0;
   z-index: 40;
   width: var(--side);
+  /* Travado na altura da viewport: só o conteúdo do dashboard rola.
+     Em telas baixas o próprio sidebar rola, sem arrastar a página junto. */
+  height: 100vh;
+  height: 100dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
   display: flex;
   flex-direction: column;
   gap: 28px;
@@ -24,6 +31,8 @@ svg { flex: 0 0 auto; }
   border-right: 1px solid rgba(255, 255, 255, 0.05);
   transition: transform 0.45s var(--ease);
 }
+.side::-webkit-scrollbar { display: none; }
+.side > * { flex-shrink: 0; }
 .side-logo { padding: 0 10px; }
 .side-logo img { width: 120px; height: auto; }
 .side-nav { display: flex; flex-direction: column; gap: 4px; }
