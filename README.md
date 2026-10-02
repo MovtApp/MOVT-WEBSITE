@@ -51,13 +51,28 @@ npm run sync:legal   # regenera /termos e /privacidade a partir das telas do app
 ├─ src/
 │  ├─ index.html · auth.html · dashboard.html
 │  ├─ termos.html · privacidade.html   # GERADOS por npm run sync:legal
-│  ├─ styles/
+│  ├─ styles/                 # global · auth · dashboard (casca) · dashboard-views (telas)
 │  └─ js/ core/ · components/ · pages/ · utils/
+│     └─ pages/dashboard/      # painel: index (entrada) · router · store · ui · views/
 ├─ scripts/                   # sync-legal.mjs + template
 ├─ tests/                     # testes de segurança do BFF
 ├─ vercel.json                # rotas, rewrite /api, headers de segurança e cache
 └─ vite.config.js             # monta o BFF no dev/preview
 ```
+
+## Telas do painel
+
+Cada item do sidebar é uma tela própria. Todas as URLs servem o mesmo `dashboard.html` (rewrite no `vercel.json` e no `vite.config.js`) e o roteador do navegador (`js/pages/dashboard/router.js`) troca só o conteúdo, sem recarregar a página.
+
+| URL | Tela |
+|---|---|
+| `/dashboard` | Início: visão geral com "Ver mais" em cada bloco |
+| `/dashboard/treinos` | Catálogo e treinos do dia (`?aba=hoje&tipo=yoga&nivel=Iniciante&q=...`) |
+| `/dashboard/agenda` | Calendário + sessões; cancelar (`?aba=historico&dia=AAAA-MM-DD`) |
+| `/dashboard/plano` | Assinatura, uso dos limites e planos; assinar e portal da Stripe |
+| `/dashboard/comunidade` | Perfil, feed (curtir), meus posts e comunidades (`?aba=posts`) |
+
+Tela nova: crie `views/<nome>.js` exportando `{ title, eyebrow, render(el, ctx) }`, registre em `pages/dashboard/index.js` e adicione o link no sidebar do `dashboard.html`. Use `ctx.signal` em todo `addEventListener` para os ouvintes morrerem ao sair da tela.
 
 ## Rotas do BFF
 
@@ -66,7 +81,11 @@ npm run sync:legal   # regenera /termos e /privacidade a partir das telas do app
 | `GET /api/auth/session` | Estado da sessão + token CSRF |
 | `POST /api/auth/login` · `register` · `logout` | Autenticação (o token fica só no cookie) |
 | `POST /api/auth/recovery/request` · `verify` · `reset` | Recuperação de senha |
-| `GET /api/me/trainings` · `appointments` · `plan` · `stats` | Dados do dashboard, já filtrados |
+| `GET /api/me/trainings` · `training-filters` · `appointments` · `plan` · `stats` · `health` | Dados do painel, já filtrados |
+| `GET /api/me/profile` · `posts` · `communities` · `billing` · `GET /api/feed` · `GET /api/plans` | Comunidade, assinatura e catálogo de planos |
+| `POST /api/me/appointments/cancel` | Cancela uma sessão (o backend confere o dono) |
+| `POST /api/feed/like` · `POST /api/me/communities/join` | Curtir post · entrar em comunidade |
+| `POST /api/me/billing/checkout` · `portal` | Abre o checkout ou o portal da Stripe |
 
 Qualquer outro caminho em `/api` responde 404. Não existe proxy aberto para o backend.
 
@@ -95,7 +114,9 @@ Sem `BFF_SESSION_KEY` ou `BFF_PROXY_SECRET`, o BFF na Vercel **recusa todas as r
 | Saída | Allowlist de campos por rota: CNPJ, IDs internos, UID do Supabase, e-mail do personal e anotações nunca chegam ao navegador |
 | Anti-enumeração | Login e recuperação de senha respondem igual, exista ou não o e-mail |
 | Força bruta | Rate limit por IP e por e-mail no BFF, além do que o backend já aplica |
-| IDOR | `/api/me/stats` usa o ID da sessão cifrada, nunca um ID enviado pelo cliente |
+| IDOR | `/api/me/stats`, `profile` e `posts` usam o ID da sessão cifrada, nunca um ID enviado pelo cliente; ações aceitam só IDs numéricos e o backend confere o dono |
+| Ações do painel | CSRF + limite por sessão; limite do plano vira 402 e "sem permissão" vira 409, sem derrubar a sessão |
+| Pagamento | O preço precisa existir no catálogo da Stripe; o BFF só devolve URLs HTTPS de `checkout.stripe.com` / `billing.stripe.com`; cobrança sai sem e-mail, CPF/CNPJ e do cartão só bandeira e final |
 | Trusted proxy | O IP real do usuário vai ao backend assinado com HMAC (janela de 60s). Sem isso, o rate limit do backend viraria global e o registro de acesso (Marco Civil) gravaria o IP da Vercel. |
 | Logs | JSON estruturado; senha, token, CPF e telefone são removidos; e-mail e IP são mascarados |
 | Navegador | CSP `connect-src 'self'` (só fala com o próprio site), sem script inline, HSTS, `frame-ancestors 'none'` |
