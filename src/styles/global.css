@@ -571,13 +571,13 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .cta-copy { padding-bottom: 60px; align-self: center; }
 .cta .eyebrow { margin-bottom: 16px; }
 .cta h2 { font-weight: 700; font-size: clamp(28px, 3.4vw, 38px); line-height: 1.2; margin-bottom: 32px; }
-.store-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+.store-btns { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
 .store {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  min-width: 190px;
+  min-width: max-content;
   height: 56px;
   padding: 0 22px;
   border-radius: 999px;
@@ -586,8 +586,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease);
 }
 .store:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 10px 40px -8px rgba(192, 255, 115, 0.55); }
-.store svg { width: 22px; height: 22px; fill: currentColor; }
-.store span { display: flex; flex-direction: column; font-family: var(--f-ui); font-weight: 700; font-size: 17px; line-height: 1; }
+.store svg { width: 22px; height: 22px; flex-shrink: 0; fill: currentColor; }
+.store span { display: flex; flex-direction: column; font-family: var(--f-ui); font-weight: 700; font-size: 17px; line-height: 1.15; white-space: nowrap; }
 .store small { font-size: 9px; font-weight: 600; margin-bottom: 2px; }
 .cta-phone { display: flex; justify-content: center; }
 .cta-phone .phone { width: 378px; margin-bottom: -120px; transition: transform 0.8s var(--ease); }
@@ -684,7 +684,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .car-btn.prev { left: 24px; }
   .car-btn.next { right: 24px; }
 
-  .store { flex: 1; min-width: 0; }
+  .store-btns { flex-wrap: nowrap; gap: 8px; }
+  .store { flex: 1 1 0; min-width: 0; padding-inline: 10px; gap: 6px; height: 52px; }
+  .store svg { width: 20px; height: 20px; }
+  .store span { font-size: 15px; }
+  .store small { font-size: 8px; }
   .cta-phone .phone { width: 260px; }
 
   .footer-brand img { width: 200px; }
