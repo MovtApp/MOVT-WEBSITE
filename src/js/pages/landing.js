@@ -4,37 +4,7 @@ import { session } from "../core/session.js";
 import { initMobileMenu } from "../components/mobile-menu.js";
 
 (() => {
-  const IMG_BASE = "/img/screens/";
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  /* ---------- Hero: colunas de mockups com scroll vertical infinito ---------- */
-  const tickers = [...document.querySelectorAll(".ticker")].map((el) => {
-    const track = document.createElement("div");
-    track.className = "ticker-track";
-    const imgs = el.dataset.imgs.split(",");
-    // Repete o set várias vezes para cobrir a altura e permitir o loop
-    for (let i = 0; i < 6; i++) {
-      for (const name of imgs) {
-        const phone = document.createElement("div");
-        phone.className = "phone";
-        const img = document.createElement("img");
-        img.src = IMG_BASE + name;
-        img.alt = "";
-        img.loading = i < 2 ? "eager" : "lazy";
-        phone.appendChild(img);
-        track.appendChild(phone);
-      }
-    }
-    el.appendChild(track);
-    return { track, speed: Number(el.dataset.speed), offset: 0, setH: 0, n: imgs.length };
-  });
-
-  const measureTickers = () => {
-    for (const t of tickers) {
-      const kids = t.track.children;
-      if (kids.length > t.n) t.setH = kids[t.n].offsetTop - kids[0].offsetTop;
-    }
-  };
 
   /* ---------- Depoimentos: marquee horizontal ---------- */
   const marquee = document.querySelector(".marquee");
@@ -59,12 +29,6 @@ import { initMobileMenu } from "../components/mobile-menu.js";
     const dt = Math.min((now - last) / 1000, 0.05);
     last = now;
     if (!reduceMotion) {
-      for (const t of tickers) {
-        if (!t.setH) continue;
-        t.offset = (t.offset + t.speed * dt) % t.setH;
-        // Desce: começa em -setH e avança até 0
-        t.track.style.transform = `translate3d(0, ${t.offset - t.setH}px, 0)`;
-      }
       if (mSetW) {
         mOffset = (mOffset + (mHover ? 12 : 40) * dt) % mSetW;
         mTrack.style.transform = `translate3d(${-mOffset}px, 0, 0)`;
@@ -73,17 +37,35 @@ import { initMobileMenu } from "../components/mobile-menu.js";
     requestAnimationFrame(tick);
   };
 
-  /* ---------- Hero: inclinação 3D guiada pelo scroll ---------- */
-  const heroInner = document.querySelector(".hero-apps-inner");
-  const heroApps = document.querySelector(".hero-apps");
-  const onScrollHero = () => {
-    if (!heroInner) return;
-    const r = heroApps.getBoundingClientRect();
-    const p = Math.min(Math.max(1 - r.top / innerHeight, 0), 1); // 0 → 1
-    const rot = 28 * (1 - p);
-    const scale = 0.9 + 0.1 * p;
-    heroInner.style.transform = `rotateX(${rot}deg) scale(${scale})`;
-  };
+
+
+  /* ---------- Treino com GPS: vídeo em loop só quando visível (respeita movimento reduzido e economia de dados) ---------- */
+  const routeVideo = document.querySelector(".route-video");
+  if (routeVideo) {
+    const soundBtn = document.querySelector(".vid-sound");
+    soundBtn?.addEventListener("click", () => {
+      routeVideo.muted = !routeVideo.muted;
+      const on = !routeVideo.muted;
+      soundBtn.setAttribute("aria-pressed", String(on));
+      soundBtn.setAttribute("aria-label", on ? "Desativar o som do vídeo" : "Ativar o som do vídeo");
+      if (on) routeVideo.play().catch(() => {});
+    });
+    const saveData = navigator.connection?.saveData === true;
+    if (!reduceMotion && !saveData) {
+      const vio = new IntersectionObserver(
+        ([en]) => {
+          if (en.isIntersecting) {
+            routeVideo.preload = "auto";
+            routeVideo.play().catch(() => {});
+          } else {
+            routeVideo.pause();
+          }
+        },
+        { threshold: 0.25 },
+      );
+      vio.observe(routeVideo);
+    }
+  }
 
   /* ---------- Nav: scroll-spy com pílula deslizante ---------- */
   const links = [...document.querySelectorAll(".nav-links a")];
@@ -210,11 +192,10 @@ import { initMobileMenu } from "../components/mobile-menu.js";
   }
 
   /* ---------- Init ---------- */
-  const onScroll = () => { onScrollHero(); spy(); };
+  const onScroll = () => { spy(); };
   addEventListener("scroll", onScroll, { passive: true });
-  addEventListener("resize", () => { measureTickers(); measureMarquee(); onScroll(); });
-  addEventListener("load", () => { measureTickers(); measureMarquee(); });
-  measureTickers();
+  addEventListener("resize", () => { measureMarquee(); onScroll(); });
+  addEventListener("load", () => { measureMarquee(); });
   measureMarquee();
   onScroll();
   requestAnimationFrame(tick);

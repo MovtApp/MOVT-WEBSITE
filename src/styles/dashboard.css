@@ -103,8 +103,8 @@ svg { flex: 0 0 auto; }
   margin-top: auto;
   padding: 18px;
   border-radius: 20px;
-  background: linear-gradient(160deg, rgba(192, 255, 115, 0.16), rgba(192, 255, 115, 0.03));
-  border: 1px solid rgba(192, 255, 115, 0.15);
+  background: linear-gradient(160deg, rgba(187, 242, 70, 0.16), rgba(187, 242, 70, 0.03));
+  border: 1px solid rgba(187, 242, 70, 0.15);
 }
 .side-app p { font-size: 14px; line-height: 1.35; margin-bottom: 12px; }
 .side-app .btn { width: 100%; }
@@ -132,11 +132,11 @@ svg { flex: 0 0 auto; }
     margin-top: auto;
     border-radius: 14px;
     color: var(--lime);
-    background: linear-gradient(160deg, rgba(192, 255, 115, 0.16), rgba(192, 255, 115, 0.03));
-    border: 1px solid rgba(192, 255, 115, 0.15);
+    background: linear-gradient(160deg, rgba(187, 242, 70, 0.16), rgba(187, 242, 70, 0.03));
+    border: 1px solid rgba(187, 242, 70, 0.15);
     transition: background 0.25s;
   }
-  .side-collapsed .side-app-mini:hover { background: rgba(192, 255, 115, 0.2); }
+  .side-collapsed .side-app-mini:hover { background: rgba(187, 242, 70, 0.2); }
   .side-app-mini svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 }
 @media (max-width: 900px) {
@@ -185,7 +185,7 @@ svg { flex: 0 0 auto; }
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--lime);
-  background: rgba(192, 255, 115, 0.12);
+  background: rgba(187, 242, 70, 0.12);
 }
 .avatar {
   width: 46px;
@@ -298,7 +298,7 @@ svg { flex: 0 0 auto; }
   font-family: var(--f-small);
   transition: background 0.25s, border-color 0.25s, transform 0.3s var(--ease);
 }
-.day:hover { transform: translateY(-3px); border-color: rgba(192, 255, 115, 0.4); }
+.day:hover { transform: translateY(-3px); border-color: rgba(187, 242, 70, 0.4); }
 .day small { font-size: 11px; color: var(--muted); text-transform: capitalize; }
 .day b { font-family: var(--f-display); font-size: clamp(16px, 1.6cqi, 24px); }
 .day.today { background: var(--lime); border-color: var(--lime); color: var(--ink); }
@@ -347,7 +347,7 @@ svg { flex: 0 0 auto; }
 .radar .ring { fill: none; stroke: rgba(255, 255, 255, 0.08); }
 .radar .axis { stroke: rgba(255, 255, 255, 0.08); }
 .radar .area {
-  fill: rgba(192, 255, 115, 0.18);
+  fill: rgba(187, 242, 70, 0.18);
   stroke: var(--lime);
   stroke-width: 2;
   stroke-linejoin: round;
@@ -475,7 +475,7 @@ svg { flex: 0 0 auto; }
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: rgba(192, 255, 115, 0.12);
+  background: rgba(187, 242, 70, 0.12);
   color: var(--lime);
   flex: 0 0 auto;
 }
@@ -492,7 +492,7 @@ svg { flex: 0 0 auto; }
   text-transform: capitalize;
   background: rgba(255, 255, 255, 0.07);
 }
-.status.confirmado, .status.concluido { background: rgba(192, 255, 115, 0.14); color: var(--lime); }
+.status.confirmado, .status.concluido { background: rgba(187, 242, 70, 0.14); color: var(--lime); }
 .status.pendente { background: rgba(255, 196, 0, 0.12); color: #ffd76a; }
 
 .empty {
@@ -505,7 +505,7 @@ svg { flex: 0 0 auto; }
   color: var(--muted);
   font-size: 14px;
 }
-.empty svg { width: 40px; height: 40px; fill: none; stroke: rgba(192, 255, 115, 0.6); stroke-width: 1.5; }
+.empty svg { width: 40px; height: 40px; fill: none; stroke: rgba(187, 242, 70, 0.6); stroke-width: 1.5; }
 
 /* ---------- Plano ---------- */
 .plan { display: flex; flex-direction: column; gap: 14px; flex: 1; }
@@ -575,7 +575,7 @@ svg { flex: 0 0 auto; }
 .sheet-body { padding: 24px; display: flex; flex-direction: column; gap: 12px; }
 .sheet-body h3 { font-weight: 700; font-size: 26px; }
 .sheet-meta { display: flex; gap: 8px; flex-wrap: wrap; }
-.sheet-meta span { padding: 6px 12px; border-radius: 999px; background: rgba(192, 255, 115, 0.12); color: var(--lime); font-family: var(--f-small); font-size: 12px; }
+.sheet-meta span { padding: 6px 12px; border-radius: 999px; background: rgba(187, 242, 70, 0.12); color: var(--lime); font-family: var(--f-small); font-size: 12px; }
 .sheet-desc { color: var(--muted); line-height: 1.5; font-size: 15px; }
 .sheet-actions { display: flex; gap: 10px; margin-top: 6px; flex-wrap: wrap; }
 .btn-ghost { background: rgba(255, 255, 255, 0.07); color: var(--white); }

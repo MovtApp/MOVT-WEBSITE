@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@500,700,900&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500&family=Wix+Madefor+Display:wght@600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500&family=Wix+Madefor+Display:wght@600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/styles/global.css" />
 </head>
 <body>
@@ -64,15 +64,262 @@
         <a href="#download" class="btn appear" style="--d:.24s">Download</a>
       </div>
 
-      <div class="hero-apps" aria-hidden="true">
-        <div class="hero-apps-inner">
-          <div class="ticker" data-speed="60"  data-imgs="health-summary.jpg,home.jpg"></div>
-          <div class="ticker" data-speed="70"  data-imgs="home.jpg,health-summary.jpg"></div>
-          <div class="ticker" data-speed="80"  data-imgs="trainers-map.jpg,workout-detail.jpg"></div>
-          <div class="ticker" data-speed="70"  data-imgs="workout-detail.jpg,trainers-map.jpg"></div>
-          <div class="ticker" data-speed="60"  data-imgs="trainers-list.jpg,trainer-profile.jpg"></div>
+      <div class="board-wrap appear" style="--d:.36s">
+        <p class="board-kicker">Um dossiê completo <span>de você.</span></p>
+
+        <div class="board" role="group" aria-label="Painel com os principais recursos do MOVT (exemplo ilustrativo)">
+
+          <article class="tile t-route reveal">
+            <video class="route-video" muted loop playsinline preload="none" poster="/video/movt-motion.jpg" aria-label="Filme do MOVT: seus dados de treino, sono e dieta reunidos, a corrida com GPS e os principais recursos do app">
+              <source src="/video/movt-motion.mp4" type="video/mp4" />
+            </video>
+            <button class="vid-sound" type="button" aria-label="Ativar o som do vídeo" aria-pressed="false">
+              <svg class="ic-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9zM17 9l4 6M21 9l-4 6"/></svg>
+              <svg class="ic-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9zM16.500 8.500a5 5 0 0 1 0 7M19 6a8.500 8.500 0 0 1 0 12"/></svg>
+            </button>
+            <div class="tile-shade" aria-hidden="true"></div>
+            <div class="tile-body">
+              <small class="tile-eyebrow">O MOVT em movimento</small>
+              <div class="chips"><span>Treino com GPS</span><span>Saúde integrada</span><span>Dieta</span></div>
+            </div>
+          </article>
+
+          <article class="tile t-health reveal" style="--d:.08s">
+            <small class="tile-eyebrow">Saúde integrada</small>
+            <div class="rings">
+              <div class="ring-mini" style="--p:.90">
+                <svg viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="34"/><circle class="fill" cx="40" cy="40" r="34"/></svg>
+                <b data-count="7215">7.215</b><small>Passos</small>
+              </div>
+              <div class="ring-mini" style="--p:.74">
+                <svg viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="34"/><circle class="fill" cx="40" cy="40" r="34"/></svg>
+                <b data-count="1842">1.842</b><small>Calorias</small>
+              </div>
+              <div class="ring-mini" style="--p:.92">
+                <svg viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="34"/><circle class="fill" cx="40" cy="40" r="34"/></svg>
+                <b>7h45</b><small>Sono</small>
+              </div>
+            </div>
+            <div class="health-week">
+              <div class="metric-caption"><span>Passos na semana</span></div>
+              <div class="week-plot"><ol aria-label="Passos por dia da semana"><li><div><i style="--bar:56%" aria-hidden="true"></i></div><span>Seg</span><span class="sr-only">: 5600 passos</span></li><li><div><i style="--bar:82%" aria-hidden="true"></i></div><span>Ter</span><span class="sr-only">: 8200 passos</span></li><li><div><i style="--bar:64%" aria-hidden="true"></i></div><span>Qua</span><span class="sr-only">: 6400 passos</span></li><li><div><i style="--bar:91%" aria-hidden="true"></i></div><span>Qui</span><span class="sr-only">: 9100 passos</span></li><li class="is-today" aria-current="date"><div><i style="--bar:72.15%" aria-hidden="true"></i></div><span>Sex</span><span class="sr-only">: 7215 passos, hoje</span></li><li><div><i style="--bar:48%" aria-hidden="true"></i></div><span>Sáb</span><span class="sr-only">: 4800 passos</span></li><li><div><i style="--bar:61%" aria-hidden="true"></i></div><span>Dom</span><span class="sr-only">: 6100 passos</span></li></ol></div>
+            </div>
+            <dl class="health-stats">
+              <div><dt>Água</dt><dd>1,6 <small>/ 2 L</small></dd><i class="water-level" aria-hidden="true"></i></div>
+              <div><dt>Tempo ativo</dt><dd>48 <small>min</small></dd></div>
+            </dl>
+            <div class="health-sync"><div class="health-foot">
+              <svg class="ecg" viewBox="0 0 120 30" aria-hidden="true"><polyline points="0,18 20,18 26,6 32,26 38,18 70,18 76,8 82,24 88,18 120,18"/></svg>
+              <span><b>78</b> bpm em repouso</span>
+            </div>
+            <div class="health-sources"><span>Apple Saúde</span><span>Health Connect</span></div>
+            <svg class="health-mark" viewBox="-4 -4 314 137" role="img" aria-label="MOVT">
+              <defs>
+                <linearGradient id="mvMetal" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#f1ffd2"/>
+                  <stop offset=".28" stop-color="#bbf246"/>
+                  <stop offset=".5" stop-color="#5c8a1c"/>
+                  <stop offset=".7" stop-color="#d6ff86"/>
+                  <stop offset="1" stop-color="#7cae2c"/>
+                </linearGradient>
+                <linearGradient id="mvSheen" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#fff" stop-opacity=".7"/>
+                  <stop offset=".45" stop-color="#fff" stop-opacity=".08"/>
+                  <stop offset=".46" stop-color="#fff" stop-opacity="0"/>
+                </linearGradient>
+                <path id="mvPath" d="M0 128.7V0H24.12L83.7 41.76H84.6L144.18 0H168.3V128.7H139.5V36L98.64 63.36V128.7H69.84V63.36L28.8 36V128.7H0ZM202.9 128.7L144.94 0H176.26L223.96 106.2H226.3L274 0H305.32L247.36 128.7H202.9Z"/>
+              </defs>
+              <use href="#mvPath" fill="url(#mvMetal)" fill-opacity=".82" stroke="rgba(255,255,255,.45)" stroke-width="2"/>
+              <use href="#mvPath" fill="url(#mvSheen)"/>
+            </svg></div>
+          </article>
+
+          <article class="tile t-trainer reveal" style="--d:.16s">
+            <img src="/img/photos/personal-2.jpg" alt="Personal trainer verificada" loading="lazy" />
+            <div class="tile-shade" aria-hidden="true"></div>
+            <div class="tile-body">
+              <small class="tile-eyebrow">Personal perto de você</small>
+              <b class="name">Ana C.</b>
+              <span class="sub">Funcional · a 800 m</span>
+              <div class="chips"><span class="ok">CREF verificado</span><span>★ 4,9</span></div>
+            </div>
+          </article>
+
+          <article class="tile t-diet reveal" style="--d:.12s">
+            <div class="diet-head">
+
+              <div>
+                <small class="tile-eyebrow">Dieta e nutrição</small>
+                <b class="name">Almoço · ~500 kcal</b>
+                <div class="chips"><span>Alta proteína</span></div>
+              </div>
+            </div>
+            <div class="diet-budget">
+              <div class="metric-caption"><span>Meta calórica do dia</span><small><b>1.240</b> / 2.000 kcal</small></div>
+              <div class="budget-track" role="meter" aria-label="Calorias consumidas no dia" aria-valuemin="0" aria-valuemax="2000" aria-valuenow="1240"><i></i></div>
+            </div>
+            <div class="meal-summary" aria-label="Resumo das refeições">
+              <span><b>Almoço</b><small>12h30 · concluído</small></span>
+              <span><b>Próxima refeição</b><small>Lanche · 16h00</small></span>
+            </div>
+            <div class="diet-composition">
+              <div class="macro-donut" role="img" aria-label="Distribuição energética aproximada do almoço: proteína 38%, carboidratos 16% e gorduras 46%"><span><b>Macros</b><small>do almoço</small></span></div>
+              <dl class="macro-legend">
+                <div><dt><i class="protein"></i>Proteína</dt><dd>42 <small>g</small></dd></div>
+                <div><dt><i class="carbs"></i>Carboidratos</dt><dd>18 <small>g</small></dd></div>
+                <div><dt><i class="fat"></i>Gorduras</dt><dd>22 <small>g</small></dd></div>
+              </dl>
+            </div>
+          </article>
+
+          <article class="tile t-comm reveal" style="--d:.2s">
+            <div class="comm-media">
+              <img src="/img/photos/grupo-corrida.jpg" alt="Grupo de corredores em uma corrida de rua" loading="lazy" decoding="async" />
+              <span class="comm-badge">Corrida</span>
+            </div>
+            <div class="comm-body">
+              <small class="tile-eyebrow">Comunidades</small>
+              <b class="name">Corrida de rua 5K</b>
+              <span class="sub">Treine em grupo, no seu ritmo</span>
+              <ul class="facts">
+                <li><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M8 3v4M16 3v4M3.500 10h17"/></svg>Sáb, 24 out · 07h00</li>
+                <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.200-6-10a6 6 0 0 1 12 0c0 4.800-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg>Largada e chegada no parque</li>
+                <li><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/></svg>Duração de cerca de 1h</li>
+              </ul>
+              <div class="seats"><span><b data-count="32">32</b> de 50 confirmados</span><i style="--w:64%"></i></div>
+              <div class="tile-foot">
+                <a class="mini-btn" href="#download">Entrar na comunidade</a>
+                <small>Converse com o grupo no mural.</small>
+              </div>
+            </div>
+          </article>
+
+          <article class="tile t-chal reveal" style="--d:.28s">
+            <small class="tile-eyebrow">Desafios</small>
+            <b class="name">Full body em 30 minutos</b>
+            <div class="chips"><span class="ok">Intermediário</span><span>30 min</span><span>8 exercícios</span></div>
+            <p class="chal-desc">Um circuito de corpo inteiro, em casa ou na academia.</p>
+            <ul class="ex-list">
+              <li><span>Agachamento livre</span><em>4 × 12</em></li>
+              <li><span>Flexão de braço</span><em>3 × 15</em></li>
+              <li><span>Remada curvada</span><em>3 × 12</em></li>
+              <li class="more">+ 5 exercícios</li>
+            </ul>
+            <div class="tile-foot">
+              <a class="mini-btn" href="#download">Aceitar desafio</a>
+            </div>
+          </article>
         </div>
-        <div class="hero-vignette"></div>
+      </div>
+
+      <ul class="pill-row appear" style="--d:.5s" aria-label="Integrações">
+        <li>Apple Saúde</li><li>Health Connect</li><li>Apple Watch</li><li>Wear OS</li><li>GPS</li><li>Live Activity</li>
+      </ul>
+
+      <ul class="sport-strip appear" style="--d:.6s" aria-label="Modalidades">
+        <li><svg viewBox="0 0 24 24"><circle cx="14" cy="4.5" r="2"/><path d="M8 21l3-6 3 2 2 4M11 15l-1-5 4-1 3 3h3M7 12l3-2"/></svg>Corrida</li>
+        <li><svg viewBox="0 0 24 24"><circle cx="6" cy="16" r="3.5"/><circle cx="18" cy="16" r="3.5"/><path d="M6 16l4-8h5l3 8M10 8L8 5H6M12 16l3-8"/></svg>Ciclismo</li>
+        <li><svg viewBox="0 0 24 24"><path d="M3 9v6M6 7v10M18 7v10M21 9v6M6 12h12"/></svg>Musculação</li>
+        <li><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><path d="M12 8v6l-4 6M12 14l4 6M5 11l7-3 7 3"/></svg>Funcional</li>
+        <li><svg viewBox="0 0 24 24"><path d="M9 3c-2 2-2 5 0 7s2 5 0 8M15 6c-2 2-2 5 0 7s2 4 1 8"/></svg>Caminhada</li>
+      </ul>
+    </section>
+
+    <!-- ================= PERSONAIS PERTO DE VOCÊ ================= -->
+    <section id="nearby" class="section container">
+      <div class="nearby">
+        <div class="nearby-copy reveal">
+          <h6 class="eyebrow">Perto de você</h6>
+          <h2 class="nearby-title">Encontre personal trainers verificados na sua região</h2>
+          <p class="nearby-lead">Abra o mapa, veja quem treina perto de você e escolha o profissional certo para o seu objetivo.</p>
+          <ul class="nearby-list">
+            <li>
+              <span class="ico"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span>
+              <div><h4>Mapa em tempo real</h4><p>Veja os profissionais ao seu redor e a distância até cada um.</p></div>
+            </li>
+            <li>
+              <span class="ico"><svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg></span>
+              <div><h4>Perfil completo</h4><p>Conheça a experiência, as avaliações e a especialidade de cada personal.</p></div>
+            </li>
+            <li>
+              <span class="ico"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg></span>
+              <div><h4>Agendamento direto</h4><p>Marque o treino e converse com o profissional pelo próprio app.</p></div>
+            </li>
+          </ul>
+        </div>
+        <div class="nearby-phones reveal" style="--d:.12s">
+          <div class="phone"><img src="/img/screens/trainers-map.jpg" alt="Mapa com personal trainers perto de você" loading="lazy" /></div>
+          <div class="fcard fcard-static fcard-nearby">
+            <img class="fcard-photo" src="/img/photos/personal-1.jpg" alt="" loading="lazy" />
+            <div><small>Personal verificado</small><b>a 1,2 km de você</b></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TUDO EM UM SÓ APP ================= -->
+    <section id="app" class="section container">
+      <h2 class="section-title reveal"><span>Tudo o que você precisa em um só app</span></h2>
+      <div class="feat-grid">
+        <article class="feat reveal">
+          <span class="ico"><svg viewBox="0 0 24 24"><path d="M4 18c3-1 3-7 6-7s3 5 6 5 2-4 4-6"/><circle cx="5" cy="18.5" r="1.5"/><circle cx="19" cy="9.5" r="1.5"/></svg></span>
+          <h3>Treino com GPS</h3>
+          <p>Registre corridas e pedaladas com o percurso no mapa, ritmo e distância.</p>
+        </article>
+        <article class="feat reveal" style="--d:.06s">
+          <span class="ico"><svg viewBox="0 0 24 24"><path d="M12 20.5C7 17 4 13.8 4 9.9A4.4 4.4 0 0 1 8.4 5.5c1.5 0 2.7.7 3.6 1.9.9-1.2 2.1-1.9 3.6-1.9A4.4 4.4 0 0 1 20 9.9c0 3.9-3 7.1-8 10.6z"/></svg></span>
+          <h3>Saúde integrada</h3>
+          <p>Passos, calorias, sono, água e batimentos em um resumo diário, com Apple Saúde e Health Connect.</p>
+        </article>
+        <article class="feat reveal" style="--d:.12s">
+          <span class="ico"><svg viewBox="0 0 24 24"><path d="M7 3v8a3 3 0 0 0 3 3v7M7 3v5M10 3v5M17 3c-2 2-2.5 5-2.5 8h2.5v10"/></svg></span>
+          <h3>Dieta e nutrição</h3>
+          <p>Monte e acompanhe seus planos alimentares, com foto e detalhes de cada refeição.</p>
+        </article>
+        <article class="feat reveal">
+          <span class="ico"><svg viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3"/><circle cx="17" cy="9.5" r="2.4"/><path d="M3.5 19c.5-3.2 2.7-5 5.5-5s5 1.8 5.5 5M15.5 14.4c2.6-.3 4.5 1.2 5 4.1"/></svg></span>
+          <h3>Comunidades e desafios</h3>
+          <p>Entre em grupos, participe de desafios e treine com quem tem o mesmo objetivo.</p>
+        </article>
+        <article class="feat reveal" style="--d:.06s">
+          <span class="ico"><svg viewBox="0 0 24 24"><path d="M4 5.5h16v10.5H9.5L5 20v-4H4z"/></svg></span>
+          <h3>Chat com profissionais</h3>
+          <p>Tire dúvidas e combine detalhes do treino direto com o seu personal.</p>
+        </article>
+        <article class="feat reveal" style="--d:.12s">
+          <span class="ico"><svg viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M21 19H3"/></svg></span>
+          <h3>Resultados e evolução</h3>
+          <p>Acompanhe seu progresso em gráficos e compare expectativa e realidade.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ================= COMO FUNCIONA ================= -->
+    <section id="how" class="section container">
+      <h2 class="section-title reveal"><span>Como funciona</span></h2>
+      <ol class="steps">
+        <li class="step reveal"><span class="step-num">1</span><h3>Crie seu perfil</h3><p>Baixe o app, informe seus objetivos e personalize sua jornada.</p></li>
+        <li class="step reveal" style="--d:.08s"><span class="step-num">2</span><h3>Encontre seu personal</h3><p>Veja os profissionais perto de você no mapa e escolha o ideal.</p></li>
+        <li class="step reveal" style="--d:.16s"><span class="step-num">3</span><h3>Acompanhe sua evolução</h3><p>Registre treinos, dieta e saúde e veja seus resultados crescerem.</p></li>
+      </ol>
+    </section>
+
+    <!-- ================= FAIXA DE FOTOS ================= -->
+    <section id="movement" class="section container">
+      <h2 class="section-title reveal"><span>Treine do seu jeito, ao lado de quem te move</span></h2>
+      <div class="photo-strip">
+        <figure class="ph ph-wide reveal">
+          <img src="/img/photos/grupo-corrida.jpg" alt="Grupo de corredores em uma corrida de rua" loading="lazy" decoding="async" />
+          <figcaption>Corrida em grupo</figcaption>
+        </figure>
+        <figure class="ph reveal" style="--d:.08s">
+          <img src="/img/photos/comunidade.jpg" alt="Amigas comemorando juntas após o treino" loading="lazy" decoding="async" />
+          <figcaption>Comunidade</figcaption>
+        </figure>
+        <figure class="ph reveal" style="--d:.16s">
+          <img src="/img/photos/treino-funcional.jpg" alt="Atleta em treino funcional na academia" loading="lazy" decoding="async" />
+          <figcaption>Treino funcional</figcaption>
+        </figure>
       </div>
     </section>
 
@@ -84,10 +331,9 @@
         <article class="card card-personal reveal">
           <h6 class="eyebrow">Personalização</h6>
           <h3 class="card-title">Encontre o personal trainer ideal para os seus objetivos</h3>
-          <div class="phones-row">
-            <div class="phone sm"><img src="/img/screens/trainers-map.jpg" alt="Mapa de personal trainers" loading="lazy" /></div>
-            <div class="phone sm"><img src="/img/screens/trainers-list.jpg" alt="Lista de profissionais" loading="lazy" /></div>
-            <div class="phone sm"><img src="/img/screens/trainer-profile.jpg" alt="Perfil do profissional" loading="lazy" /></div>
+          <div class="photo-pair">
+            <img src="/img/photos/personal-1.jpg" alt="Personal trainer" loading="lazy" />
+            <img src="/img/photos/personal-2.jpg" alt="Personal trainer" loading="lazy" />
           </div>
         </article>
 
@@ -207,6 +453,14 @@
         <button class="car-btn next" aria-label="Próximo"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
       </div>
       <div class="center reveal"><a href="#" class="btn">Ver todos</a></div>
+    </section>
+
+    <!-- ================= FAIXA DA MARCA ================= -->
+    <section class="brand-band reveal" aria-label="Faça parte do movimento">
+      <svg class="scribble scribble-c" viewBox="0 0 120 60"><path d="M4 50C30 40 60 24 112 8M96 6l16 2-8 14"/></svg>
+      <svg class="scribble scribble-d" viewBox="0 0 60 60"><path d="M30 4l6 20 20 6-20 6-6 20-6-20-20-6 20-6z"/></svg>
+      <h2>Este é o seu espaço.</h2>
+      <p>Quem te disse que o futuro é chato? Nunca pare de tentar. O futuro é seu.</p>
     </section>
 
     <!-- ================= CTA / DOWNLOAD ================= -->
